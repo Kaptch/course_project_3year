@@ -86,19 +86,18 @@
     \supervisor\\
     \ifthenelse{\value{worktype} = 2}{%
     Рецензент:\\
-    ученая степень, ученое звание, должность
-    И. О. Фамилия
+    ученая степень, ученое звание [, должность] И. О. Фамилия
     }{}
 	\end{flushright}
 \ifthenelse{\value{worktype} = 0}{
 \vspace{\fill}
         \begin{flushleft}
           \begin{tabular}{cc}
-            \underline{\hspace{2cm}}&\underline{\hspace{5cm}}\\
-            {\small (оценка)} & {\small  (подпись руководителя)}\\
+            \underline{\hspace{4cm}}&\underline{\hspace{5cm}}\\
+            {\small оценка (рейтинг)} & {\small  подпись руководителя}\\
           \end{tabular}
           \\[1cm]
-          Утверждаю:\\руководитель направления ФИИТ: \underline{\hspace{4cm}}
+          Утверждаю:\\руководитель направления ФИИТ \underline{\hspace{4cm}}
 В.\,С.\,Пилиди
         \end{flushleft}
 }{}
