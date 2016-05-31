@@ -4,7 +4,7 @@
 %\usepackage {showframe}
 
 % Вертикальные отступы на титульной странице
-\newcommand{\vgap}{\vspace{10pt}}
+\newcommand{\vgap}{\vspace{16pt}}
 
 % Помещение города и даты в нижний колонтитул
 \usepackage{scrlayer}
@@ -54,7 +54,8 @@
 
     \vgap}{}
 
-    \MakeTextUppercase{\thetitle}
+    {\usefont{T2A}{PTSansCaption-TLF}{m}{n}
+    \MakeTextUppercase{\thetitle}}
 
     \ifthenelse{\value{worktype} = 2}{%
      \vgap
@@ -75,7 +76,9 @@
     \vspace {\fill}
 
     \begin{flushright}
-    \ifthenelse{\value{worktype} = 1 \OR \value{worktype} = 0}{
+    \ifthenelse{\value{worktype} = 0 \OR 
+                \value{worktype} = 1 \OR
+                \value{worktype} = 3}{
       \bystudent \ifthenelse{\value{worktype} = 0}{3}{4}\ курса\\
       \byme
     }{}
@@ -86,7 +89,7 @@
     \supervisor\\
     \ifthenelse{\value{worktype} = 2}{%
     Рецензент:\\
-    ученая степень, ученое звание [, должность]
+    ученая степень, ученое звание, должность
     И. О. Фамилия
     }{}
 	\end{flushright}
@@ -98,8 +101,6 @@
             {\small оценка (рейтинг)} & {\small  подпись руководителя}\\
           \end{tabular}
           \\[1cm]
-%          Утверждаю:\\руководитель направления ФИИТ \underline{\hspace{4cm}}
-%В.\,С.\,Пилиди
         \end{flushleft}
 }{}
 \ifthenelse{\value{worktype} = 1 \OR \value{worktype} = 3}{
@@ -113,7 +114,6 @@
 
 
   	\vspace {\fill}
-
   %Ростов-на-Дону
 
     %\thedate

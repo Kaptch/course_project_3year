@@ -41,8 +41,6 @@
 
 %%% Заголовки
 
-
-
 \ifthenelse{\equal{\theworktype}{2}}{%
 \KOMAoptions{%
     numbers=endperiod,% точки после номеров разделов
@@ -73,6 +71,18 @@
 \renewcommand*{\captionformat}{~---~}
 \renewcommand*{\figureformat}{Рисунок~\thefigure}
 
+% Плавающие листинги
+\usepackage{float}
+\floatstyle{ruled}
+\floatname{ListingEnv}{Листинг}
+\newfloat{ListingEnv}{htbp}{lol}[section]
+
+% точка после номера листинга
+\makeatletter
+\renewcommand\floatc@ruled[2]{{\@fs@cfont #1.} #2\par}
+\makeatother
+
+
 %%% Оглавление
 \usepackage{tocloft}
 
@@ -99,12 +109,17 @@
 \renewcommand{\cftsecpagefont}{}
 }
 
+% Точки после верхних элементов оглавления
+\renewcommand{\cftsecdotsep}{\cftdotsep}
+%\newcommand{\cftchapdotsep}{\cftdotsep}
+
 \ifthenelse{\value{worktype} > 1}{%
     \renewcommand{\cftchapaftersnum}{.}
-}{
+}{}
 \renewcommand{\cftsecaftersnum}{.}
 \renewcommand{\cftsubsecaftersnum}{.}
-}
+\renewcommand{\cftsubsubsecaftersnum}{.}
+
 %%% Списки (enumitem)
 
 \usepackage {enumitem}      % Списки с настройкой отступов
@@ -132,9 +147,10 @@
 \usepackage[
   backend=biber,
   hyperref=auto,
+  sorting=none, % сортировка в порядке встречаемости ссылок
   language=auto,
   citestyle=gost-numeric,
-  bibstyle=gost-numeric,
+  bibstyle=gost-numeric
 ]{biblatex}
 \addbibresource{biblio.bib} % Файл с лит.источниками
 
