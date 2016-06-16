@@ -183,4 +183,21 @@ texdoc имя_пакета
 % и огромное количество примеров там же:
 % http://mirror.macomnet.net/pub/CTAN/macros/latex/contrib/biblatex-contrib/biblatex-gost/doc/biblatex-gost-examples.pdf
 
+\appendix
+\ifthenelse{\value{worktype} > 1}{%
+  \addtocontents{toc}{%
+      \protect\renewcommand{\protect\cftchappresnum}{\appendixname\space}%
+      \protect\addtolength{\protect\cftchapnumwidth}{\widthof{\appendixname\space{}} - \widthof{Глава }}%
+  }%
+}{
+  \addtocontents{toc}{%
+      \protect\renewcommand{\protect\cftsecpresnum}{\appendixname\space}%
+      \protect\addtolength{\protect\cftsecnumwidth}{\widthof{\appendixname\space{}}}%
+  }%
+}
+
+\section{Пример работы программы}
+
+Здесь длинный листинг с примером работы.
+
 \end{document}

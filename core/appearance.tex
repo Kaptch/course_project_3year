@@ -41,13 +41,20 @@
 
 %%% Заголовки
 
-\ifthenelse{\equal{\theworktype}{2}}{%
-\KOMAoptions{%
-    numbers=endperiod,% точки после номеров разделов
-    headings=normal,   % размеры заголовков поменьше стандартных
-    chapterprefix=true,% Печатать слово Глава в магистерской
-    appendixprefix=true% Печатать слово Приложение
-}
+
+\ifthenelse{{\value{worktype} > 1}}{%
+  \KOMAoptions{%
+      headings=normal,   % размеры заголовков поменьше стандартных
+      chapterprefix=true,% Печатать слово Глава
+      appendixprefix=true% Печатать слово Приложение
+  }
+}{% Печатать слово Приложение даже если нет глав
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\sectionformat}{%
+    \appendixname~\thesection\autodot\enskip}
+    \renewcommand*{\sectionmarkformat}{%
+      \appendixname~\thesection\autodot\enskip}
+  }
 }
 
 % шрифт для оформления глав и названия содержания
