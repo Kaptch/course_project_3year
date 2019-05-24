@@ -13,7 +13,7 @@
   foreground,
   contents={%
     \raisebox{\dp\strutbox}[\layerheight][0pt]{%
-      \parbox[b]{\layerwidth}{\centering Ростов-на-Дону\\ \thedate%
+      \parbox[b]{\layerwidth}{\centering Ростов-на-Дону --- \thedate%
        \\\mbox{}
        }}%
   }
@@ -21,107 +21,64 @@
 \DeclareNewPageStyleByLayers{titlepage}{titlepage.foot.fg}
 
 
-\AtBeginDocument %
-{ %
-  %
+\AtBeginDocument
+{
+
   \begin{titlepage}
-  %
+  
     \thispagestyle{titlepage}
 
     {\centering
-    %
-    \MakeTextUppercase {МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РФ}
+    
+    \MakeTextUppercase {МИНОБРНАУКИ России}
 
     \vgap
 
     Федеральное государственное автономное образовательное\\
     учреждение высшего образования\\
-    \MakeTextUppercase {Южный федеральный университет}
+    \MakeTextUppercase {<<Южный федеральный университет>>}
 
     \vgap
 
 	Институт математики, механики и компьютерных наук
     имени~И.\,И.\,Воровича
-
-    \vgap
-
-    \direction
-
+    
+    \department
+    
     \vspace* {\fill}
-
-    \ifthenelse{\value{worktype} = 2}{%
-    \me
-
-    \vgap}{}
-
+    
+    \MakeTextUppercase{\me}
+    
+    \vspace* {\fill}
+    
     {\usefont{T2A}{PTSansCaption-TLF}{m}{n}
     \MakeTextUppercase{\thetitle}}
+    
+    \vspace* {\fill}
 
-    \ifthenelse{\value{worktype} = 2}{%
-     \vgap
-
-    Магистерская диссертация}{}
+	\ifthenelse{\value{worktype} = 2}{
+    \MakeTextUppercase{Магистерская диссертация}\\
+    }{}
     \ifthenelse{\value{worktype} = 0}{
-     \vgap
-
-    Курсовая работа
-    }{}%
+    \MakeTextUppercase{Курсовая работа}\\
+    }{}
     \ifthenelse{\value{worktype} = 1 \OR \value{worktype} = 3}{
-     \vgap
-
-    Выпускная квалификационная работа\\
-    на степень бакалавра
-    }{}%
-
-    \vspace {\fill}
-
-    \begin{flushright}
-    \ifthenelse{\value{worktype} = 0 \OR 
-                \value{worktype} = 1 \OR
-                \value{worktype} = 3}{
-      \bystudent \ifthenelse{\value{worktype} = 0}{3}{4}\ курса\\
-      \byme
-    }{}
-
+    \MakeTextUppercase{Выпускная квалификационная работа\\
+    на степень бакалавра}
+	}{}
+    \direction
+   
     \vgap
-
-    Научный руководитель:\\
-    \supervisor\\
-    \ifthenelse{\value{worktype} = 2}{%
-    Рецензент:\\
-    ученая степень, ученое звание, должность
-    И. О. Фамилия
-    }{}
-	\end{flushright}
-\ifthenelse{\value{worktype} = 0}{
-\vspace{\fill}
-        \begin{flushleft}
-          \begin{tabular}{cc}
-            \underline{\hspace{4cm}}&\underline{\hspace{5cm}}\\
-            {\small оценка (рейтинг)} & {\small  подпись руководителя}\\
-          \end{tabular}
-          \\[1cm]
-        \end{flushleft}
-}{}
-\ifthenelse{\value{worktype} = 1 \OR \value{worktype} = 3}{
-\vspace{\fill}
-        \begin{flushleft}
-Допущено к защите:\\руководитель направления ФИИТ
-\underline{\hspace{4cm}}
-В.\,С.\,Пилиди
-        \end{flushleft}
-}{}
-
+    
+    Научные руководители:\\
+    \supervisorA\\
+    \supervisorB
 
   	\vspace {\fill}
-  %Ростов-на-Дону
-
-    %\thedate
 
   }\end{titlepage}
-  %
-  %
+  
   \tableofcontents
-  %
+  
   \clearpage
-} %
+}

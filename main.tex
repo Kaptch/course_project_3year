@@ -15,173 +15,133 @@
 
 \Intro
 
-Здесь нужно написать введение.
+Гомотопическая теория типов (Homotopy type theory, HoTT) \autocite{hottbook} --- относительно новая область в информатике, которая базируется на неожиданной связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) \autocite{UFP2010} --- попытки формализовать математику, используя в качестве основы не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход в первую очередь интересен тем, что позволяет работать с гомотопической теорией, используя \textit{синтетический метод}, то есть не опираясь на более базовые примитивы, как, например, множества, также очень важным преимуществом HoTT являются хорошие вычислительные свойства, унаследованные от зависимой теории типов Мартин-Лёфа \autocite{MLTT}. Первоначальная версия гомотопической теории типов включала в себя \textit{Аксиому унивалентности}, что открыло возможность для формализации крупного пласта математики на теоретико-типовом языке: экстенсиональности функций и равенства структур, между которыми доказано существование изоморфизма. Но у этой версии было одно очень важное ограничение --- аксиома не имела вычислительной интерпретации. В данный момент наиболее многообещающим решением является использование \textit{кубической теории типов} \autocite{CohenCHM16}, в которой эта аксиома является теоремой, имеющей конструктивное доказательство.
+
+Для обоснования гомотопической интерпретации следует доказать эквивалентность конструкций, которые есть в теории типов с гомотопическими понятиями. В этой работе доказывается изоморфизм между $\Pi$-типом и расслоением.
+
 
 % Если typeOfWork в SETUP.tex задан как 2 или 3, то начинать
 % надо не с section (раздел), а с главы (chapter)
-\section{Несколько примеров в~\LaTeX{}}
-\label{sec:examples}
+\section{Расслоения}
+\label{sec:fiberbundles}
 
-Некоторые часто используемые
-команды приведены в качестве примера ниже (и варианты — в
-комментариях). Мы рекомендуем внимательно прочесть данный
-текст и изучить его исходный код прежде, чем начинать писать
-свой собственный. Кроме того, можно дать и такой совет: идущий
-ниже текст не убирать до самого конца, а просто оставлять его
-позади своего собственного текста, чтобы в любой момент можно
-было проконсультироваться с данными примерами.
+Расслоениями называется класс отображений TODO
 
-\subsection{Как вставлять листинги и рисунки}
+\subsection{Определения}
 
-Для крупных листингов есть два способа. Первый красивый, но в нём не допускается
-кириллица (у вас может встречаться в комментариях и
-печатаемых сообщениях), он представлен на листинге~\ref{list:hwbeauty}.
-\begin{ListingEnv}[H]% буква H означает Here, ставим здесь,
-% элементы, которые нежелательно разрывать обычно не ставят
-% посреди страницы: вместо H используется t (top, сверху страницы),
-% или b (bottom) или p (page, на отдельной странице)
-\begin{lstlisting}
-#include <iostream>
-using namespace std;
+\subsection{Примеры}
 
-int main()
-{
-    cout << "Hello, world" << endl;
-    system("pause");
-    return 0;
-}
-\end{lstlisting}
-%следующую команду для генерации подписи можно опустить,
-% хотя рекомендуется все специальные элементы (таблицы, рисунки,
-% листинги) подписывать. Если подпись пропустить, листинг также не получит
-% номера и на него не сошлёшься в будущем
-\caption{Программа “Hello, world” на \protect\cpp}
-% далее метка для ссылки:
-\label{list:hwbeauty}
-\end{ListingEnv}
-
-Второй не такой красивый, но без ограничений (см.~листинг~\ref{list:hwplain}).
-\begin{ListingEnv}[H]
-\begin{Verb}
-
-#include <iostream>
-using namespace std;
-
-int main()
-{
-    cout << "Привет, мир" << endl;
-}
-\end{Verb}
-\caption{Программа “Hello, world” без подсветки}
-\label{list:hwplain}
-\end{ListingEnv}
-
-Можно использовать первый для вставки небольших фрагментов
-внутри текста, а второй для вставки полного
-кода в приложении, если таковое имеется.
-
-Если нужно вставить совсем короткий пример кода (одна или две строки), то выделение  линейками и нумерация может смотреться чересчур громоздко. В таких случаях можно использовать окружения \texttt{lstlisting} или \texttt{Verb} без \texttt{ListingEnv}. Приведём такой пример с указанием языка программирования, отличного от заданного по умолчанию:
-\begin{lstlisting}[language=Haskell]
-fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
-\end{lstlisting}
-Такое решение~--- со вставкой нумерованных листингов покрупнее
-и вставок без выделения для маленьких фрагментов~--- выбрано,
-например, в книге Эндрю Таненбаума и Тодда Остина по архитектуре
-компьютера~\autocite{TanAus2013} (см.~рис.~\ref{fig:tan-aus}).
-
-Наконец, для оформления идентификаторов внутри строк
-(функция \lstinline{main} и тому подобное) используется
-\texttt{lstinline} или, самое простое, моноширинный текст
-(\texttt{\textbackslash texttt}).
-
-\begin{figure}[p]% p означает, что нужно выделить для рисунка
-% отдельную страницу; применяется для больших рисунков
+\begin{figure}[!h]
 \centering
-%Здесь могла быть ваша лягушка.
-\includegraphics[width=\textwidth]{img/tan-aus.png}
-\caption{\label{fig:tan-aus}Пример оформления листингов в~\autocite{TanAus2013}}
+\begin{tikzpicture}[scale=1.50]
+\begin{axis}[
+    hide axis,
+    view={45}{45}
+]
+%\addplot3 [
+%    surf, shader=faceted interp,
+%    point meta=x,
+%    colormap/jet,
+%    samples=40,
+%    samples y=5,
+%    z buffer=sort,
+%    domain=126:135,
+%    y domain=-2:22
+%] (
+%    {sin(x)},
+%    {cos(x)},
+%    {y-20}); 
+\addplot3 [
+    surf, shader=faceted interp,
+    point meta=x,
+    colormap/jet,
+    samples=40,
+    samples y=5,
+    z buffer=sort,
+    domain=0:360,
+    y domain=-2:2
+] (
+    {sin(x)},
+    {cos(x)},
+    {y-20});
+\addplot3 [
+    samples=50,
+    domain=0:360,
+    samples y=0,
+    thick
+] (
+    {cos(x)},
+    {sin(x)},
+    {-20});
+\addplot3 [
+    samples=50,
+    domain=0:360,
+    samples y=0,
+    thick
+] (
+    {cos(x)},
+    {sin(x)},
+    {-10});     
+\addplot3 [
+    surf, shader=faceted interp,
+    point meta=x,
+    colormap/jet,
+    samples=40,
+    samples y=5,
+    z buffer=sort,
+    domain=0:360,
+    y domain=-1:1
+] (
+    {(1+0.5*y*cos(x/2)))*cos(x)},
+    {(1+0.5*y*cos(x/2)))*sin(x)},
+    {0.5*y*sin(x/2)});
+\addplot3 [
+    samples=50,
+    domain=-145:180,
+    samples y=0,
+    thick
+] (
+    {cos(x)},
+    {sin(x)},
+    {0}); 
+\end{axis}
+\end{tikzpicture}
+\caption{Примеры расслоений} \label{fig:P1}
 \end{figure}
 
-Использовать внешние файлы (например, рисунки) можно и на \href{http://overleaf.com}{overleaf.com}: ищите кнопочку upload.
+\begin{ListingEnv}[H]
+\begin{Verb}
+\func neg_neg : \Pi (x : I) -> ((inv seg) @ (inv seg @ x)) = x => \lam x =>
+    ((\lam x => (\lam i => inv (squeezePath (inv seg) i)) (inv seg @ x)) x)
+    # (inv ((\lam x => ((\lam x => (\lam i => inv (squeezePath seg i)) (seg @ x)) x) # seg) x))
 
-\subsection{Как оформить таблицу}
+\func twist : I = I => Iso=>Path \new Iso I I neg neg neg_neg neg_neg
 
-Для таблиц обычно используются окружения table и tabular --- см. таблицу~\ref{tab:widgets}. Внутри окружения tabular используются специальные команды пакета booktabs — они очень красивые; самое главное: использование вертикальных линеек считается моветоном.
+\func M : \Pi (x : S1) -> \Type => \lam x => \case x \with {
+  | base => I
+  | loop i => twist @ i
+}
 
-\begin{table}
-\centering
-\caption{\label{tab:widgets}Подпись к таблице --- сверху}
-\begin{tabular}{llr}
-\toprule
-\multicolumn{2}{c}{Item} \\
-\cmidrule(r){1-2}
-Животное  & Описание    & Цена (\$) \\
-\midrule
-Gnat      & per gram    & 13.65      \\
-          & each        & 0.01       \\
-Gnu       & stuffed     & 92.50      \\
-Emu       & stuffed     & 33.33      \\
-Armadillo & frozen      & 8.99       \\
-\bottomrule
-\end{tabular}
-\end{table}
+\record Moebius (p1 : S1) {
+  \field f1 : M(p1)
+}
+\end{Verb}
+\end{ListingEnv}
 
-\subsection{Как набирать формулы}
+\section{$\Pi$-типы}
 
-\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
-$$S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
-      = \frac{1}{n}\sum_{i}^{n} X_i$$
-denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
+\subsection{Определение}
 
-\subsection{Как оформлять списки}
+\subsection{Примеры}
 
-Нумерованные списки (окружение enumerate, команды item)…
-
-\begin{enumerate}
-  \item Like this,
-  \item and like this.
-\end{enumerate}
-
-\dots маркированные списки \dots
-
-\begin{itemize}
-  \item Like this,
-  \item and like this.
-\end{itemize}
-
-\dots списки-описания \dots
-
-\begin{description}
-  \item[Word] Definition
-  \item[Concept] Explanation
-  \item[Idea] Text
-\end{description}
+\section{Построение доказательства}
 
 \Conc
 
-Помните, что на все пункты списка литературы должны быть ссылки. \LaTeX\ просто не добавит информацию об издании из bib"/файла, если на это издание нет ссылки в тексте. Часто студенты используют в работе  электронные ресурсы: в этом нет ничего зазорного при одном условии: при каждом заимствовании следует ставить соответствующую ссылку. В качестве примера приведём ссылку на сайт нашего института~\autocite{mmcs}.
-
-Для дальнейшего изучения \LaTeX\ рекомендуем книгу Львовского~\autocite{Lvo2003}: она хорошо написана, хотя и несколько устарела.
-Обычно стоит искать подсказки на
-\href{http://tex.stackexchange.com/}{tex.stackexchange.com}, а также
-читать документацию по установленным пакетам с помощью
-команды
-\begin{Verb}
-texdoc имя_пакета
-\end{Verb}
-или на \href{http://ctan.org/}{ctan.org}.
-
-% Печать списка литературы (библиографии)
 \printbibliography[%{}
     heading=bibintoc%
-    %,title=Библиография % если хочется это слово
+    ,title=Библиография
 ]
-% Файл со списком литературы: biblio.bib
-% Подробно по оформлению библиографии:
-% см. документацию к пакету biblatex-gost
-% http://ctan.mirrorcatalogs.com/macros/latex/exptl/biblatex-contrib/biblatex-gost/doc/biblatex-gost.pdf
-% и огромное количество примеров там же:
-% http://mirror.macomnet.net/pub/CTAN/macros/latex/contrib/biblatex-contrib/biblatex-gost/doc/biblatex-gost-examples.pdf
 
 \appendix
 \ifthenelse{\value{worktype} > 1}{%
@@ -196,8 +156,45 @@ texdoc имя_пакета
   }%
 }
 
-\section{Пример работы программы}
+\section{Код доказательства}
 
-Здесь длинный листинг с примером работы.
+\begin{ListingEnv}[H]
+\begin{Verb}
+\func encode (B : \Type) (F : B -> \Type) (y : B) :
+      fiber (total B F) B (trivial B F) y -> F y
+   => \lam (x : fiber (total B F) B (trivial B F) y)
+   => subst B F x.1.1 y x.2 x.1.2
+
+\func decode (B : \Type) (F : B -> \Type) (y : B) :
+      F y -> fiber (total B F) B (trivial B F) y
+   => \lam (x : F y) => ((y, x), path (\lam i => y))
+
+\func decode->encode (B : \Type) (F : family B) (y : B) :
+  \Pi (x : F y) -> (encode B F y (decode B F y x)) = x
+  => \lam (x : F y)
+  => path 
+  (\lam i 
+  => encode B F ((decode B F y x).2 @ i) ((y, x), (path (\lam _ => y))))
+
+\func encode->decode (B : \Type) (F : family B) (y : B) :
+  \Pi (x : fiber (total B F) B (trivial B F) y) 
+  -> (decode B F y (encode B F y x)) = x
+  => \lam (x : fiber (total B F) B (trivial B F) y) 
+  => path (\lam i => {?})
+
+\func TrivialFiberBundle=PiType (B : \Type) 
+	(F : family B) 
+	(y : B) : 
+	(fiber (total B F) B (trivial B F) y) = (F y)
+  	=> Iso=>Path 
+  	(\new Iso 
+  	(fiber (total B F) B (trivial B F) y)
+  	(F y)
+  	(encode B F y) 
+  	(decode B F y) 
+  	(encode->decode B F y) 
+  	(decode->encode B F y))
+\end{Verb}
+\end{ListingEnv}
 
 \end{document}
