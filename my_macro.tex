@@ -1,14 +1,14 @@
 
 
 % макросы для начала введения и заключения
-\newcommand{\Intro}{\addsec{Введение}}
+\newcommand{\Annot}{\addsec{Annotation}}
 \ifthenelse{\value{worktype} > 1}{%
-    \renewcommand{\Intro}{\addchap{Введение}}%
+    \renewcommand{\Intro}{\addchap{Annotation}}%
 }
 
-\newcommand{\Conc}{\addsec{Заключение}}
+\newcommand{\Conc}{\addsec{Сonclusion}}
 \ifthenelse{\value{worktype} > 1}{%
-    \renewcommand{\Conc}{\addchap{Заключение}}%
+    \renewcommand{\Conc}{\addchap{Сonclusion}}%
 }
 
 % Правильные значки для нестрогих неравенств и пустого множества
