@@ -13,17 +13,21 @@
 
 \begin{document}
 
-\Annot
+\Introduction
 
 Результаты, полученные в современной математике, становятся всё сложнее. Постепенно подступает момент, когда математики, работающие в разных областях, окончательно перестанут понимать друг друга, а их результаты станет невозможно проверить. Одним из наиболее активно использующихся решений является проверка математических результатов с помощью средств доказательства теорем. Этот класс инструментов сам по себе заслуживает особого внимания, так как было создано множество непохожих подходов, в основе которых лежат интересные теории.
 
 Гомотопическая теория типов (Homotopy type theory, HoTT) \autocite{hottbook} --- относительно новая область в информатике, которая базируется на неожиданной связи между теорией типов и теорией гомотопий. Эта область лежит в основе \textit{Унивалентных оснований математики} (Univalent Foundation, UF) \autocite{UFP2010} --- попытки формализовать математику, используя в качестве основы не множества, а гомотопические типы или $\infty$-группоиды, а также \textit{высшие индуктивные типы} (Higher Inductive Types, HIT). Этот подход в первую очередь интересен тем, что позволяет работать с гомотопической теорией, используя \textit{синтетический метод}, то есть не опираясь на более базовые примитивы, как, например, множества, также очень важным преимуществом HoTT являются хорошие вычислительные свойства, унаследованные от зависимой теории типов Мартин-Лёфа \autocite{MLTT}. Первоначальная версия гомотопической теории типов включала в себя \textit{аксиому унивалентности}, что открыло возможность для формализации крупного пласта математики на теоретико-типовом языке: экстенсиональности функций и равенства структур, между которыми доказано существование изоморфизма. Но у этой версии было одно очень важное ограничение --- аксиома не имела вычислительной интерпретации. В данный момент наиболее многообещающим решением является использование \textit{кубической теории типов} \autocite{CohenCHM16}, в которой эта аксиома является теоремой, имеющей конструктивное доказательство.
 
-Для обоснования гомотопической интерпретации следует доказать эквивалентность конструкций, которые есть в теории типов, с гомотопическими понятиями. И если гомотопическая интерпретация функций, типов-равенств интуитивно понятна, то зависимые типы требуют большего внимания. В этой работе исследуется доказывательство изоморфизма между $\Pi$-типом и расслоением в системе верификации доказательств Arend. 
+Для обоснования гомотопической интерпретации следует доказать эквивалентность конструкций, которые есть в теории типов, с гомотопическими понятиями. И если гомотопическая интерпретация функций, типов-равенств интуитивно понятна, то зависимые типы требуют большего внимания. В этой работе исследуется доказывательство изоморфизма между семействами типов и расслоением в системе верификации доказательств Arend. \autocite{Arend}  
 
 Код, которому посвящена данная работа, можно найти на GitHub \autocite{Grp1} в репозитории организации Groupoid Infinity.
 
 \section{Dependent types}
+
+Dependent type theory is an powerful language, which allows to express complex assertions, write sophisticated software specifications, and reason about this in a natural way. A fast majority of modern proof assistants work with some king of dependently typed language. 
+
+The following work was performed with one of the flavors of intensional type theory --- \textit{homotopy type theory}, which takes seriously the natural interpretation of identity types as formalizing path space objects in homotopy theory. This flavor comes with a few benefits: higher inductive types, which can be used to obtain quotients objects or free structures, univalence that simplify the process of moving back and forth between isomorphic structures and synthetic approach to homotopy theory, which is much easier to formalize in HoTT than classical set-based homotopy theory.
 
 \subsection{Brief preliminaries}
 
@@ -37,7 +41,7 @@ Dependent types can be briefly summarized with a few postulates:
   \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$.
 \end{enumerate}
 
-It can be formalized using Arend:
+It can be easily formalized using Arend:
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -45,19 +49,23 @@ It can be formalized using Arend:
 \end{lstlisting}
 \end{ListingEnv}
 
-% TODO
+The basic operations on dependent types are the dependent sum $\Sigma_{(x : A)}B(x)$, which is the type of pairs $(x:A, y:B(x))$, and the dependent product $\Pi_{(x : A)}B(x)$, which is the type of functions $f$ such that $\forall x:A, f(x):B(x)$. When $B$ is constant, the dependent sum reduces to the binary product $A \times B$, and the dependent product reduces to the function type $B^A$.
+
+\subsection{Task}
+
+For the purpose of working with homotopy theory \textit{synthetically}, an isomophism between basic type theory constructions and its homotopy equivalents ought to be proved. The dependent type definition reminds of the notion of family of objects indexed over a different object, which is ubiquitous in mathematics; this hint can lead to one of the most basic homotopy theory concept --- \textit{fiber bundle}.
 
 \section{Fiber bundles}
 \label{sec:fiberbundles}
 
 \subsection{Idea}
-A fiber bundle over an object $B$ is simply a an object $E$ paired with a morphism from $E$ to $B$ in which every fibre is isomorphic to a standard fiber $F$ and a fiber of a morphism over a point of $B$ is the collection of elements of $E$ that are mapped by given morphism to this point. It can be viewed as a parameterized family of objects, each "isomorphic" in some way to $F$, where the family is parameterized by points in $B$.
+A fiber bundle over an object $B$ is simply a an object $E$ paired with a morphism from $E$ to $B$ in which every fiber is isomorphic to a standard fiber $F$ and a fiber of a morphism over a point of $B$ is the collection of elements of $E$ that are mapped by given morphism to this point. It can be viewed as a parameterized family of objects, each "isomorphic" in some way to $F$, where the family is parameterized by points in $B$.
 
 Fiber bundles arise in several diverse fields such as physics (this concept embodies the two central principles of modern physics: the gauge principle and the principle of locality), Lie theory (principal G-bundles) and homotopy theory (they generalize notion of a covering space in homotopy theory, because a covering space is an fiber bundle where the fibers are discrete sets). Also fundamental objects in algebraic topology (fibrations) and algebraic geometry (sheaves) are simply generalized fiber bundles.
 
 \subsection{Definition}
 
-Some definitions are equipped with a corresponding Arend functions or data types.
+Some definitions are equipped with a corresponding Arend functions or data types. \autocite{nlab}
 
 \begin{mydefinition}[Bundle]
 	A bundle over an object $B$ is an object $E$ equipped with a morphism $\phi$ from $E$ to $B$:
@@ -118,8 +126,7 @@ Some definitions are equipped with a corresponding Arend functions or data types
 
 \subsection{Example}
 
-An idea behind the fiber bundle is that it encapsulates the "global twist". Two fiber bundles over a $S_1$ with $[0..1]$ fibers are visualized below and formalized (Arend code for Möbius strip can be found in Appendix A) for clarification. Locally cylinder and Möbius strip are identical, but globally they differ.
-% Some information about Hopf-fibrations?
+An idea behind the fiber bundle is that it encapsulates the "global twist". Two fiber bundles over a $S_1$ with $[0 \dots 1]$ fibers are visualized below and formalized (Arend code for Moebius strip can be found in Appendix A) for clarification. Locally cylinder and Moebius strip are identical, but globally they differ. As an example, if we start with a circle as the base space, and map every point of the circle to a copy of the interval $[0 \dots 1]$, such that as we go once around the circle, the interval comes back with a "twist", then we obtain the Moebius strip of Figure \ref{fig:1}.  
 
 \begin{figure}[H]
 \centering
@@ -174,16 +181,23 @@ An idea behind the fiber bundle is that it encapsulates the "global twist". Two 
     {0}); 
 \end{axis}
 \end{tikzpicture}
-\caption{Fiber bundles over a circle} \label{fig:P1}
+\caption{Fiber bundles over a circle} \label{fig:1}
 \end{figure}
 
 \section{Proof}
 
-% TODO
+The proof is straightforward --- as we already have both formalizations, we need to construct an equivalence between them and obtain a path between type, which represents fiber bundles, and dependent type using univalence.
+\begin{mydefinition}[Equivalences]
+	$f : A \to B$ is an equivalence if there is a map $g : B \to A$ and homotopies $p : \Pi_{a : A}(g(f(a)) = a)$ and $q : \Pi_{b : B}(f(g(b)) = b)$
+\end{mydefinition}
+\begin{mydefinition}[Univalence]
+	For any two types $X$, $Y$, this map $(X=Y) \to (X \simeq Y)$ is an equivalence.
+\end{mydefinition}
 
 \Conc
 
-% TODO
+In this paper I have demonstrated that homotopy type theory is a practical language to work with homotopy theory synthetically by showing the correspondence between fiber bundles and dependent types. We can benefit from synthetic approach, because computer formalizing sophisticated homotopy constructs, such as Hopf-fibrations and homotopy fiber sequences, becomes much easier if language of formalization naturally express basic homotopy theory structures. Because paper proofs in synthetic homotopy theory are often proven with many details, giving a fully formal proof is not much more work, but it could drastically reduce chances of making errors. But sometimes formalization takes more work than was expected, because proofs should be encoded in the corresponding logic, intensional type theory. \autocite{Doorn1}
+This result is not problematic to proof in HoTT-supportive proof assistant, such as Arend, but plays a role as an example of using univalence in formal proof. The proof can be simplified by using proof assistant that supports heterogeneous composition.
 
 \printbibliography[%{}
     heading=bibintoc%
@@ -203,7 +217,7 @@ An idea behind the fiber bundle is that it encapsulates the "global twist". Two 
   }%
 }
 
-\section{Möebius strip}
+\section{Moebius strip}
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
