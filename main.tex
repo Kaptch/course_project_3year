@@ -250,19 +250,130 @@
 %\end{lstlisting}
 %\end{ListingEnv}
 
+%Аннотация
+%Гомотопическая теория типов (Homotopy type theory, HoTT) --- область информатики, которая базируется на связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) --- попытки формализовать математику, используя в качестве фундамента не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход интересен тем, что позволяет работать с гомотопической теорией, используя синтетический метод, то есть, не опираясь на более базовые примитивы, как, например, множества, также очень важным преимуществом HoTT являются хорошие вычислительные свойства, унаследованные от зависимой теории типов Мартин-Лёфа.
+%В работе рассматривается формализация нетривиального расслоения окружности --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиального расслоения и зависимого типа на верификатор доказательств Arend.
+%Код, которому посвящена данная работа, можно найти на GitHub \autocite{Grp1} в репозитории организации Groupoid Infinity. Доказательство выполнено в файле Bundle.ard \autocite{Bundle}, формализация ленты Мёбиуса --- в файле Moebius.ard \autocite{Moebius}.
+
 \Introduction
 
-% Math sections
+% Task
+In this paper I report on formalizing homotopy type of a Moebius strip and on porting proof of isomorphism between a trivial fiber bundle and a dependent type using proof assistant Arend.
 
-% Verification of different fields of math and different proof-assistants
+% Math fields
+The following work was performed with one of the flavors of intensional type theory---homotopy type theory, which takes seriously the natural interpretation of identity types as formalizing path space objects in homotopy theory. This flavor comes with a few benefits: higher inductive types, which can be used to obtain quotients objects or free structures, univalence that simplify the process of moving back and forth between isomorphic structures, and a synthetic approach to homotopy theory.
 
-% Well developed/proof-assistants under development
+% Verification of different fields of math. Different proof-assistants
+
+
+% Well developed/proof-assistants/checkers under development
+Theorem provers based on type theory come with different sets of most basic operations. Some of these sets are studied better than another. Arend provides its users with an interval type, an eliminator for an identity type---textit{coe}, and a function \textit{iso}, which can be used to define univalence.
 
 % Dependent types (bare definitions with refs)
+Dependent types can be defined using a few postulates \autocite{Wellen1}:
+\begin{enumerate}
+  \item A hierarchy of type universes is given: $U_0 : U_1 : U_2 : \dots$.
+  \item If the universe level is unambiguous, then the level may be dropped.
+  \item The statement "$A$ is a type" means that $A : U_i$ for some $i \in \N$.
+  \item The statement "$a : A$" is given a meaning, that $a$ is an term of type $A$.
+  \item For any types $A$ and $B$, we may form a type $A \to B$ that represents a function. And a term $f : A \to B$ of this type may be constructed by demonstrating that $f(a) : B$ under the assumption $a : A$.
+  \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$.
+\end{enumerate}
 
 % Fibre bundle (bare definitions with refs)
+Fiber bundles and corresponding structure can be defined as follows \autocite{nlab}:
+\begin{mydefinition}[Bundle]
+A bundle over an object $B$ is an object $E$ equipped with a morphism $\phi$ from $E$ to $B$:
+\[
+\begin{diagram}
+	\node{E} 
+		\arrow{e,t}{\phi} 
+	\node{B} 
+\end{diagram}
+\]
+\end{mydefinition}
+
+\begin{mydefinition}[Fiber]
+The fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
+\[
+\begin{diagram}
+	\node{E \times \star}
+		\arrow{s,t}{}
+		\arrow{e,t}{}
+	\node{\star} 
+		\arrow{s,t}{pt} \\
+	\node{E}
+		\arrow{e,t}{f} 
+	\node{B}
+\end{diagram}
+\]
+\end{mydefinition}
+
+\begin{mydefinition}[Fiber bundle]
+A fiber bundle over $B$ with standard fiber $F$ is a bundle $\pi$ over $B$ such that, given any global element $x : \star \to B$, the pullback of $E$ along $x$ is isomorphic to $F$.
+\end{mydefinition}
+
+\begin{mydefinition}[Trivial fiber bundle]
+The fiber bundle is trivial if $E$ is simply a product $B \times F$ and $\pi$ is the projection map of the first element of $E$.
+\end{mydefinition}
 
 % Example (pic)
+Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ are the cylinder and the Moebius strip. Locally they are the same, but globally the Moebius strip comes with a twist.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.25]
+\begin{axis}[
+    hide axis,
+    view={40}{40}
+]
+\addplot3 [
+    surf, shader=faceted interp,
+    point meta=x,
+    colormap/greenyellow,
+    samples=40,
+    samples y=5,
+    z buffer=sort,
+    domain=0:360,
+    y domain=-2:2
+] (
+    {sin(x)},
+    {cos(x)},
+    {y-20});
+\addplot3 [
+    samples=50,
+    domain=0:360,
+    samples y=0,
+    thick
+] (
+    {cos(x)},
+    {sin(x)},
+    {-20});   
+\addplot3 [
+    surf, shader=faceted interp,
+    point meta=x,
+    colormap/greenyellow,
+    samples=40,
+    samples y=5,
+    z buffer=sort,
+    domain=0:360,
+    y domain=-1:1
+] (
+    {(1+0.5*y*cos(x/2)))*cos(x)},
+    {(1+0.5*y*cos(x/2)))*sin(x)},
+    {0.5*y*sin(x/2)});
+\addplot3 [
+    samples=50,
+    domain=-145:180,
+    samples y=0,
+    thick
+] (
+    {cos(x)},
+    {sin(x)},
+    {0}); 
+\end{axis}
+\end{tikzpicture}
+\caption{Fiber bundles over a circle} \label{fig:1}
+\end{figure}
 
 \section{Example of a fibre bundle}
 
@@ -270,6 +381,9 @@
 
 \Conc
 
-
+\printbibliography[%{}
+    heading=bibintoc%
+    ,title=Bibliography
+]
 
 \end{document}
