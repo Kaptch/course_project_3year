@@ -257,41 +257,27 @@
 
 \Introduction
 
-% Task
-In this paper I report on formalizing homotopy type of a Moebius strip and on porting a proof of an isomorphism between a trivial fiber bundle and a dependent type using proof assistant Arend.
+Proof assistants are computer systems, which are designed to do mathematics on a computer. Some proof assistants also allow to define functions and compute on them, but their main focus is on doing proofs. They allow to define some statements and to reason about their correctness. A few of them, which are also automated theorem provers, also help a user with a set of well chosen decision procedures that allow to automatically prove formulas of a specific restricted format\autocite{ProofAssistants1}.
 
-% Verification of different fields of math. Different proof-assistants
-Proof assistants are computer systems, which are designed to do mathematics on a computer. They allow a user to define some statements and to reason about their correctness. Some of them also help user with a set of well chosen decision procedures that allow formulas of a specific restricted format to be proved automatically\autocite{ProofAssistants1}.
+Large part of proof assistants are based on type theory, which is due to Curry–Howard correspondence---correspondence between logical and type-theoretic operations. There are a few classifications of type theories. One of these classifications divides type theories between two flavors: \textit{intensional type theories} and \textit{extensional type theories}. The former is the flavor in which types that represent equalities are not necessarily propositions. Type theory, which is not intensional, is called extensional. The following work was performed with one of the flavors of intensional type theory---homotopy type theory, which takes seriously the natural interpretation of identity types as formalizing path space objects in homotopy theory. This type theory comes with a few benefits: higher inductive types, which help to obtain quotients objects or free structures, univalence that simplify the process of moving back and forth between isomorphic structures, and a synthetic approach to homotopy theory.
 
-% Math fields
-The following work was performed with one of the flavors of intensional type theory---homotopy type theory, which takes seriously the natural interpretation of identity types as formalizing path space objects in homotopy theory. This flavor comes with a few benefits: higher inductive types, which can be used to obtain quotients objects or free structures, univalence that simplify the process of moving back and forth between isomorphic structures, and a synthetic approach to homotopy theory.
+There are several proof assistants, which support homotopy type theory natively or via extensions. Some of them are Coq\autocite{coq}, Agda\autocite{agda}, cubicaltt\autocite{cubicaltt}, and redtt\autocite{redtt}. They come with different sets of most basic operations. Some of these sets are studied better than another. Arend\autocite{arend} is a proof assistant, which provides users with an interval type (a type that is inductively constructed from two terms, whose interpretation is as the endpoints of the interval, together with a path between them); an eliminator for an interval type---\textit{coe}, which allows, for every type over the interval, to transport elements from the fiber over left to the fiber over an arbitrary point; a dependent path type, which consist of all functions that maps elements of the interval type to the term of type parameterized by the given term of the interval type; and a function \textit{iso}, which can be used to define univalence---one of the cornerstones of homotopy type theory\autocite{arenddocs}\autocite{ncatlabIntervalType}.
 
-% Well developed/proof-assistants/checkers under development
-Theorem provers based on type theory come with different sets of most basic operations. Some of these sets are studied better than another. Arend provides its users with an interval type, an eliminator for an identity type---\textit{coe}, a dependent path type, and a function \textit{iso}, which can be used to define univalence.
+Homotopy type theory relies on the idea that type theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way. % actually homotopy equivalent
 
-% Dependent types (bare definitions with refs)
+In this paper I report on formalizing a Moebius strip and on porting a proof of an equivalence between the fibration and the type family using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy and type theories. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Bundle.ard\autocite{Bundle}).
+
+\section{Preliminaries}
+
 Dependent types can be defined using a few postulates\autocite{Wellen1}:
 \begin{enumerate}
-  \item A hierarchy of type universes is given: $U_0 : U_1 : U_2 : \dots$.
+  \item A hierarchy of type universes (``types of types'') is given: $U_0 : U_1 : U_2 : \dots$. 
   \item If the universe level is unambiguous, then the level may be dropped.
   \item The statement ``$A$ is a type'' means that $A : U_i$ for some $i \in \N$.
   \item The statement ``$a : A$'' is given a meaning, that $a$ is an term of type $A$.
   \item For any types $A$ and $B$, we may form a type $A \to B$ that represents a function. And a term $f : A \to B$ of this type may be constructed by demonstrating that $f(a) : B$ under the assumption $a : A$.
   \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$.
 \end{enumerate}
-
-% Fibre bundle (bare definitions with refs)
-Fiber bundles and corresponding structure can be defined as follows\autocite{nlab}:
-\begin{mydefinition}[Bundle]
-A bundle over an object $B$ is an object $E$ equipped with a morphism $\phi$ from $E$ to $B$:
-\[
-\begin{diagram}
-	\node{E} 
-		\arrow{e,t}{\phi} 
-	\node{B} 
-\end{diagram}
-\]
-\end{mydefinition}
 
 \begin{mydefinition}[Fiber]
 The fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
@@ -309,15 +295,7 @@ The fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of e
 \]
 \end{mydefinition}
 
-\begin{mydefinition}[Fiber bundle]
-A fiber bundle over $B$ with standard fiber $F$ is a bundle $\pi$ over $B$ such that, given any global element $x : \star \to B$, the pullback of $E$ along $x$ is isomorphic to $F$.
-\end{mydefinition}
 
-\begin{mydefinition}[Trivial fiber bundle]
-The fiber bundle is trivial if $E$ is simply a product $B \times F$ and $\pi$ is the projection map of the first element of $E$.
-\end{mydefinition}
-
-% Example (pic)
 Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ are the cylinder and the Moebius strip. Locally they are the same, but globally the Moebius strip comes with a twist as visualized in Figure \ref{fig:1}.
 \begin{figure}[H]
 \centering
@@ -327,57 +305,197 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
     view={40}{40}
 ]
 \addplot3 [
-    surf, shader=faceted interp,
-    point meta=x,
+    surf, shader = faceted interp,
+    point meta = x,
     colormap/greenyellow,
-    samples=40,
-    samples y=5,
-    z buffer=sort,
-    domain=0:360,
-    y domain=-2:2
+    samples = 40,
+    samples y = 5,
+    z buffer = sort,
+    domain = 0:360,
+    y domain = -2:2
 ] (
     {sin(x)},
     {cos(x)},
-    {y-20});
+    {y-20}
+  );
+  
 \addplot3 [
-    samples=50,
-    domain=0:360,
-    samples y=0,
+    samples = 50,
+    domain = 0:360,
+    samples y = 0,
     thick
 ] (
     {cos(x)},
     {sin(x)},
-    {-20});   
+    {-20}
+  );   
+  
 \addplot3 [
-    surf, shader=faceted interp,
-    point meta=x,
+    surf, shader = faceted interp,
+    point meta = x,
     colormap/greenyellow,
-    samples=40,
-    samples y=5,
-    z buffer=sort,
-    domain=0:360,
-    y domain=-1:1
+    samples = 40,
+    samples y = 5,
+    z buffer = sort,
+    domain = 0:360,
+    y domain = -1:1
 ] (
     {(1+0.5*y*cos(x/2)))*cos(x)},
     {(1+0.5*y*cos(x/2)))*sin(x)},
-    {0.5*y*sin(x/2)});
+    {0.5*y*sin(x/2)}
+  );
+  
 \addplot3 [
-    samples=50,
-    domain=-145:180,
-    samples y=0,
+    samples = 50,
+    domain = -145:180,
+    samples y = 0,
     thick
 ] (
     {cos(x)},
     {sin(x)},
-    {0}); 
+    {0}
+  ); 
 \end{axis}
 \end{tikzpicture}
 \caption{Fiber bundles over a circle} \label{fig:1}
 \end{figure}
 
-\section{Example of a fibre bundle}
+\section{Example of a fibration}
 
-\section{Results}
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func neg_neg : \Pi (x : I) -> ((inv seg) @ (inv seg @ x)) = x 
+  => \lam x 
+    =>  ((\lam x 
+      => (\lam i 
+        => inv (connAnd (inv seg) i)) (inv seg @ x)) x)
+        # (inv ((\lam x 
+          => ((\lam x 
+            => (\lam i 
+              => inv (connAnd seg i)) (seg @ x)) x) # seg) x))
+
+\func twist : I = I => Iso=>Path
+    \new Iso I I neg neg neg_neg neg_neg
+
+\func M : \Pi (x : S1) -> \Type => \lam x => \case x \with {
+  | base => I
+  | loop i => twist @ i
+}
+
+\record Moebius (p1 : S1) {
+  \field f1 : M(p1)
+}
+\end{lstlisting}
+\end{ListingEnv}
+
+\section{Isomorphism between a fibration and a dependent type}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func family (B : \Type) : \Type => B -> \Type
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func total (B : \Type) (F : family B) : \Type 
+	=> \Sigma (x : B) (F x)
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func trivial (B : \Type) (F : family B) : total B F -> B 
+	=> \lam (x : total B F) => x.1
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func fiber (A B : \Type) (f : A -> B) (base : B)
+   => \Sigma (x : A) (f x = base)
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func encode (B : \Type) (F : B -> \Type) (y : B) :
+      fiber (total B F) B (trivial B F) y -> F y
+   => \lam (x : fiber (total B F) B (trivial B F) y)
+   => subst B F x.1.1 y x.2 x.1.2
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func decode (B : \Type) (F : B -> \Type) (y : B) :
+      F y -> fiber (total B F) B (trivial B F) y
+   => \lam (x : F y) => ((y, x), path (\lam i => y))
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func decode->encode (B : \Type) (F : family B) (y : B) :
+  \Pi (x : F y) -> (encode B F y (decode B F y x)) = x
+  => \lam (x : F y)
+    => path (\lam i
+      => encode
+              B
+              F
+              ((decode B F y x).2 @ i)
+              ((y, x), (path (\lam _ => y))))
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func encode->decode (B : \Type) (F : family B) (y : B) :
+  \Pi (x : fiber (total B F) B (trivial B F) y)
+    -> (decode B F y (encode B F y x)) = x
+  => \lam (x : fiber (total B F) B (trivial B F) y)
+    => path (\lam i
+      => (((inv x.2) @ i,
+           (pathOverFamily (transport_twist F x.2 x.1.2)) @ i),
+          (pathOverFamily ((coe_path (inv x.2) rfl rfl)
+                      # (comp-assoc (inv (inv x.2)) rfl rfl)
+                         # (refl-right ((inv (inv x.2)) # rfl))
+                            # (refl-right (inv (inv x.2)))
+                               # (inv_inv x.2))) @ i))
+          \where
+            \func transport_twist {A : \Type} (B : A -> \Type)
+                                  {a b : A}
+                                  (p : a = b) (x : B a) :
+              transport B (inv p) (transport B p x) = x
+              => J (\lam z (p' : a = z)
+                => transport B (inv p') (transport B p' x) = x) rfl p
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func hFiber=DependentTypeParameterized (B : \Type) 
+	(F : family B) (y : B) : 
+	(fiber (total B F) B (trivial B F) y) = (F y)
+  => Iso=>Path 
+  	(\new Iso 
+  		(fiber (total B F) B (trivial B F) y) 
+  		(F y) 
+  		(encode B F y) 
+  		(decode B F y) 
+  		(encode->decode B F y) 
+  		(decode->encode B F y))
+\end{lstlisting}
+\end{ListingEnv}
+
+\begin{ListingEnv}[H]
+\begin{lstlisting}
+\func Fibration=DependentType (B : \Type) (F : family B) : 
+  (fiber (total B F) B (trivial B F)) = F
+  => path (\lam i y
+    => (hFiber=DependentTypeParameterized B F y) @ i)
+\end{lstlisting}
+\end{ListingEnv}
 
 \Conc
 
