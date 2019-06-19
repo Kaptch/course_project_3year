@@ -261,7 +261,7 @@ Proof assistants are computer systems, which are designed to do mathematics on a
 
 Large part of proof assistants are based on type theory, which is due to Curry–Howard correspondence---correspondence between logical and type-theoretic operations. There are a few classifications of type theories. One of these classifications divides type theories between two flavors: \textit{intensional type theories} and \textit{extensional type theories}. The former is the flavor in which types that represent equalities are not necessarily propositions. Type theory, which is not intensional, is called extensional. The following work was performed with one of the flavors of intensional type theory---homotopy type theory, which takes seriously the natural interpretation of identity types as formalizing path space objects in homotopy theory. This type theory comes with a few benefits: higher inductive types, which help to obtain quotients objects or free structures, univalence that simplify the process of moving back and forth between isomorphic structures, and a synthetic approach to homotopy theory.
 
-There are several proof assistants, which support homotopy type theory natively or via extensions. Some of them are Coq\autocite{coq}, Agda\autocite{agda}, cubicaltt\autocite{cubicaltt}, and redtt\autocite{redtt}. They come with different sets of most basic operations. Some of these sets are studied better than another. Arend\autocite{arend} is a proof assistant, which provides users with an interval type (a type that is inductively constructed from two terms, whose interpretation is as the endpoints of the interval, together with a path between them); an eliminator for an interval type---\textit{coe}, which allows, for every type over the interval, to transport elements from the fiber over left to the fiber over an arbitrary point; a dependent path type, which consist of all functions that maps elements of the interval type to the term of type parameterized by the given term of the interval type; and a function \textit{iso}, which can be used to define univalence---one of the cornerstones of homotopy type theory\autocite{arenddocs}\autocite{ncatlabIntervalType}.
+There are several proof assistants, which support homotopy type theory natively or via extensions. Some of them are Coq\autocite{Coq}, Agda\autocite{Agda}, cubicaltt\autocite{Cubicaltt}, and redtt\autocite{Redtt}. They come with different sets of most basic operations. Some of these sets are studied better than another. Arend\autocite{Arend} is a proof assistant, which provides users with an interval type (a type that is inductively constructed from two terms, whose interpretation is as the endpoints of the interval, together with a path between them); an eliminator for an interval type---\textit{coe}, which allows, for every type over the interval, to transport elements from the fiber over left to the fiber over an arbitrary point; a dependent path type, which consist of all functions that maps elements of the interval type to the term of type parameterized by the given term of the interval type; and a function \textit{iso}, which can be used to define univalence---one of the cornerstones of homotopy type theory\autocite{Arenddocs}\autocite{nlab}.
 
 Homotopy type theory relies on the idea that type theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way. % actually homotopy equivalent
 
@@ -269,14 +269,23 @@ In this paper I report on formalizing a Moebius strip and on porting a proof of 
 
 \section{Preliminaries}
 
-Type theory contains two basic judgements. The first, typing judgement $a : A$, states that a term $a$ has type $A$. The second, $a \equiv b : A$, asserts, that terms $a$ and $b$ are judgementally equal at type $A$. Judgemental equality is a relation between linguistic expressions and can be used to rewrite expressions.
-A type-context $\Gamma$ is any finite set of judgements. E.g. $\Gamma = \{a : A, b : A, c : C\}$. The turnstile $\vdash$ between a context and a type judgement should be interpreted as: ``in the context $\Gamma$, the expression $a$ has type $A$''. E.g. $\Gamma \vdash a : A$. The rules of type theory tell us how to construct new types, how to construct terms of some types, and how to use such terms to construct terms of other types. The rules can be write as follows:
+Type theory contains two basic judgements. The first, typing judgement $a : A$, states that a term $a$ has type $A$. The motivation behind this notion varies:
+\begin{enumerate}
+	\item $a$ is an element of set $A$.
+	\item $A$ is a problem and $a$ is a solution of $A$.
+	\item $a$ is a proof of a proposition $A$.
+	\item $A$ is a space and $a$ is a point of $A$.
+\end{enumerate}
+The first perspective is due to Russell, the second is due to Kolmogorov, the third is due to Curry and Howard and the fourth alternative comes from homotopy type theory\autocite{Warren1}. 
+The second judgement, $a \equiv b : A$, asserts, that terms $a$ and $b$ are judgementally equal at type $A$. Judgemental equality is a relation between linguistic expressions and can be used to rewrite expressions\autocite{hottbook}. A notion of assumption is present in type theories in form of type-context.
+A definition of the type-context depends on the concrete theory. For the following definitions it can be thought of as any finite set of judgements. E.g. $\Gamma = \{a : A, b : A, c : C\}$. The turnstile $\vdash$ between a context and a type judgement should be interpreted as: ``in the context $\Gamma$, the expression $a$ has type $A$''. E.g. $\Gamma \vdash a : A$. The rules of type theory tell us how to construct new types, how to construct terms of some types, and how to use such terms to construct terms of other types. The rules can be write as follows:
 \begin{prooftree}
 \AxiomC{$\Gamma \vdash f : A \to B$}
 \AxiomC{$\Gamma \vdash a : A$}
 \BinaryInfC{$\Gamma \vdash f(a) : B$}
 \end{prooftree}
-Dependent types can be defined using a few postulates\autocite{Wellen1}:
+This rule states that given terms $f : A \to B$ and $a : A$ in the context of $\Gamma$ we can derive a term $f(a) : B$.
+Also we can construct dependent types. Dependent types can be defined using a few postulates\autocite{Wellen1}:
 \begin{enumerate}
   \item A Russell style hierarchy of type universes (types whose terms are types) is given: $U_0, U_1, U_2, \dots$. The hierarchy is cumulative: $U_m : U_n$ for $m < n$, and also if $A : U_m$ and $m \leq n$, then $A : U_m$. With universes, we can write the judgement ``$A$ is a type'' as a judgement that $A$ is a term of some universe. The HoTT book uses this approach.  
   \item If the universe level is unambiguous, then the level may be dropped to reduce unnecessary information.
@@ -284,7 +293,8 @@ Dependent types can be defined using a few postulates\autocite{Wellen1}:
   \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$. A judgement $x : A \vdash B(x) : U$ is a dependent type over $A$.
 \end{enumerate}
 
-\begin{mydefinition}[Fiber]
+
+\begin{mydefinition}[Homotopy fiber]
 The fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
 \[
 \begin{diagram}
@@ -378,15 +388,27 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
           => ((\lam x 
             => (\lam i 
               => inv (connAnd seg i)) (seg @ x)) x) # seg) x))
+\end{lstlisting}
+\end{ListingEnv}
 
+\begin{ListingEnv}[H]
+\begin{lstlisting}
 \func twist : I = I => Iso=>Path
     \new Iso I I neg neg neg_neg neg_neg
+\end{lstlisting}
+\end{ListingEnv}
 
+\begin{ListingEnv}[H]
+\begin{lstlisting}
 \func M : \Pi (x : S1) -> \Type => \lam x => \case x \with {
   | base => I
   | loop i => twist @ i
 }
+\end{lstlisting}
+\end{ListingEnv}
 
+\begin{ListingEnv}[H]
+\begin{lstlisting}
 \record Moebius (p1 : S1) {
   \field f1 : M(p1)
 }
