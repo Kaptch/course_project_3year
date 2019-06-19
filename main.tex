@@ -269,14 +269,19 @@ In this paper I report on formalizing a Moebius strip and on porting a proof of 
 
 \section{Preliminaries}
 
+Type theory contains two basic judgements. The first, typing judgement $a : A$, states that a term $a$ has type $A$. The second, $a \equiv b : A$, asserts, that terms $a$ and $b$ are judgementally equal at type $A$. Judgemental equality is a relation between linguistic expressions and can be used to rewrite expressions.
+A type-context $\Gamma$ is any finite set of judgements. E.g. $\Gamma = \{a : A, b : A, c : C\}$. The turnstile $\vdash$ between a context and a type judgement should be interpreted as: ``in the context $\Gamma$, the expression $a$ has type $A$''. E.g. $\Gamma \vdash a : A$. The rules of type theory tell us how to construct new types, how to construct terms of some types, and how to use such terms to construct terms of other types. The rules can be write as follows:
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash f : A \to B$}
+\AxiomC{$\Gamma \vdash a : A$}
+\BinaryInfC{$\Gamma \vdash f(a) : B$}
+\end{prooftree}
 Dependent types can be defined using a few postulates\autocite{Wellen1}:
 \begin{enumerate}
-  \item A hierarchy of type universes (``types of types'') is given: $U_0 : U_1 : U_2 : \dots$. 
-  \item If the universe level is unambiguous, then the level may be dropped.
-  \item The statement ``$A$ is a type'' means that $A : U_i$ for some $i \in \N$.
-  \item The statement ``$a : A$'' is given a meaning, that $a$ is an term of type $A$.
+  \item A Russell style hierarchy of type universes (types whose terms are types) is given: $U_0, U_1, U_2, \dots$. The hierarchy is cumulative: $U_m : U_n$ for $m < n$, and also if $A : U_m$ and $m \leq n$, then $A : U_m$. With universes, we can write the judgement ``$A$ is a type'' as a judgement that $A$ is a term of some universe. The HoTT book uses this approach.  
+  \item If the universe level is unambiguous, then the level may be dropped to reduce unnecessary information.
   \item For any types $A$ and $B$, we may form a type $A \to B$ that represents a function. And a term $f : A \to B$ of this type may be constructed by demonstrating that $f(a) : B$ under the assumption $a : A$.
-  \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$.
+  \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$. A judgement $x : A \vdash B(x) : U$ is a dependent type over $A$.
 \end{enumerate}
 
 \begin{mydefinition}[Fiber]
