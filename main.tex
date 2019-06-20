@@ -294,7 +294,7 @@ Also we can construct dependent types. Dependent types can be defined using a fe
 \end{enumerate}
 
 Now let's turn to several of the constructions more closely related to the homotopy theoretic side of things. Fibrations can be understood as a homotopy theoretic generalization of the notion of a fiber bundle. If working with spaces, a fibration is a map $\phi : E \to B$, which possesses a certain homotopy-lifting property. In this particular case we would refer to $B$ as the \textit{base space} and to $E$ as the \textit{total space} of the fibration. Given a point $b : B$, the \textit{fiber} over $b$ is just preimage $\phi^{-1}(b)$ of $b$ under the map $\phi$. The idea behind the fibration that it can be completely recovered from its base space $B$ together with its fibers by ``connecting'' the fibers together in accordance with the structure of the base space. Let's proceed with a more formal definitions\autocite{Warren1}.
-The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
+The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ ($\star$-valued point of $B$) and $f$:
 \[
 \begin{diagram}
 	\node{E \times \star}
@@ -307,9 +307,9 @@ The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collec
 	\node{B}
 \end{diagram}
 \]
-Lets call fibration any continuous map $p : E \to B$. $E$ will be called the total space and $B$ the base space of the fibration. There are a lot of different fibrations, which come with restriction to this general definition (e.g. trivial fibration, Serre fibration, and so on).
+Lets call fibration any continuous map $p : E \to B$, which has the homotopy-lifting property from arbitrary spaces. $E$ will be called the total space and $B$ the base space of the fibration. There are a lot of different fibrations, which come with restriction to this general definition (e.g. trivial fibration, Serre fibration, and so on)\autocite{Warren1}.
 
-A fibration $\phi$ is trivial if it is equivalent to a product fibration.
+A fibration $\phi$ is trivial if it is equivalent to a product fibration\autocite{Warren1}.
 \[
 \begin{diagram}
 	\node{E}
@@ -431,7 +431,7 @@ Finally, we can obtain a formalization of the Moebius strip as a total space, wh
 
 \section{Isomorphism between a fibration and a dependent type}
 
-To prove a correspondence between a fibration and a dependent type we need to formalize these two notions, to provide mutually inverse functions between these constructions and to prove that homotopies between compositions of these two functions and identity functions exist. 
+To prove a correspondence between the fibration and the dependent type we need to formalize these two notions, to provide mutually inverse functions between these constructions and to prove that homotopies between compositions of these two functions and identity functions exist. 
 A formalization of a dependent type is straightforward---it is a function that maps elements of some type to types.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -452,14 +452,14 @@ Also we need to define a projection that will serve as the trivial fibration.
 	=> \lam (x : total B F) => x.1
 \end{lstlisting}
 \end{ListingEnv}
-
+The homotopy fiber of $f : A \to B$ over $base : B$ can be defined as an element of $A$ together with a path from $f x$ to $base$.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func fiber (A B : \Type) (f : A -> B) (base : B)
    => \Sigma (x : A) (f x = base)
 \end{lstlisting}
 \end{ListingEnv}
-
+To construct an element of a given dependent type parameterized by some element $y : B$ from the fiber of trivial projection over the same element we can use a wrapper around an eliminator for the interval type.   
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func encode (B : \Type) (F : B -> \Type) (y : B) :
@@ -468,7 +468,7 @@ Also we need to define a projection that will serve as the trivial fibration.
    => subst B F x.1.1 y x.2 x.1.2
 \end{lstlisting}
 \end{ListingEnv}
-
+An inverse of the previous function can be defined be direct fiber construction. 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func decode (B : \Type) (F : B -> \Type) (y : B) :
@@ -476,7 +476,7 @@ Also we need to define a projection that will serve as the trivial fibration.
    => \lam (x : F y) => ((y, x), path (\lam i => y))
 \end{lstlisting}
 \end{ListingEnv}
-
+To prove that a composition of decode and encode in this particular order is just an identity map we can prove that application of some element $x$ to the composition equals the exactly same element. The proof is straightforward since the outer function has an extra computational rule because it is defined with coe.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func decode->encode (B : \Type) (F : family B) (y : B) :
@@ -487,10 +487,10 @@ Also we need to define a projection that will serve as the trivial fibration.
               B
               F
               ((decode B F y x).2 @ i)
-              ((y, x), (path (\lam _ => y))))
+              (decode B F y x))
 \end{lstlisting}
 \end{ListingEnv}
-
+TODO
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func encode->decode (B : \Type) (F : family B) (y : B) :
@@ -514,7 +514,7 @@ Also we need to define a projection that will serve as the trivial fibration.
                 => transport B (inv p') (transport B p' x) = x) rfl p
 \end{lstlisting}
 \end{ListingEnv}
-
+To obtain an element of the identity type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ from equivalence we can use an univalence. To do so we can use a wrapper around Arend built-in function iso that implies the univalence axiom.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func hFiber=DependentTypeParameterized (B : \Type) 
@@ -530,7 +530,7 @@ Also we need to define a projection that will serve as the trivial fibration.
   		(decode->encode B F y))
 \end{lstlisting}
 \end{ListingEnv}
-
+We can go even further. Since we have proved that for every element of base type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ holds, we can prove that family itself equals a fiber over an arbitrary point.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func Fibration=DependentType (B : \Type) (F : family B) : 
@@ -539,9 +539,9 @@ Also we need to define a projection that will serve as the trivial fibration.
     => (hFiber=DependentTypeParameterized B F y) @ i)
 \end{lstlisting}
 \end{ListingEnv}
-
+Quod erat demonstrandum.
 \Conc
-
+In this paper I provided the proof of a correspondence between dependent types---basic type theoretic constructions, and fibrations---basic homotopy theoretic constructions in the proof-assistant Arend. This correspondence shows that working on homotopy theory can be approached syntactically if using type theory with ease, because there is no need for complex definitions of simplest homotopy construction.
 \begin{otherlanguage}{english}
 \printbibliography[%{}
     heading=bibintoc%
