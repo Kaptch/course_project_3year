@@ -278,7 +278,7 @@ Type theory contains two basic judgements. The first, typing judgement $a : A$, 
 \end{enumerate}
 The first perspective is due to Russell, the second is due to Kolmogorov, the third is due to Curry and Howard and the fourth alternative comes from homotopy type theory\autocite{Warren1}. 
 The second judgement, $a \equiv b : A$, asserts, that terms $a$ and $b$ are judgementally equal at type $A$. Judgemental equality is a relation between linguistic expressions and can be used to rewrite expressions\autocite{hottbook}. A notion of assumption is present in type theories in form of type-context.
-A definition of the type-context depends on the concrete theory. For the following definitions it can be thought of as any finite set of judgements. E.g. $\Gamma = \{a : A, b : A, c : C\}$. The turnstile $\vdash$ between a context and a type judgement should be interpreted as: ``in the context $\Gamma$, the expression $a$ has type $A$''. E.g. $\Gamma \vdash a : A$. The rules of type theory tell us how to construct new types, how to construct terms of some types, and how to use such terms to construct terms of other types. The rules can be write as follows:
+A definition of the type-context depends on the concrete theory. For the following definitions it can be thought of as any finite set of judgements. E.g. $\Gamma = \{a : A, b : A, c : C\}$. The turnstile $\vdash$ between a context and a type judgement should be interpreted as: ``in the context $\Gamma$, the expression $a$ has type $A$''. E.g. $\Gamma \vdash a : A$. The rules of type theory tell us how to construct new types, how to construct terms of some types, and how to use such terms to construct terms of other types. The rules can be written as follows:
 \begin{prooftree}
 \AxiomC{$\Gamma \vdash f : A \to B$}
 \AxiomC{$\Gamma \vdash a : A$}
@@ -293,25 +293,37 @@ Also we can construct dependent types. Dependent types can be defined using a fe
   \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$. A judgement $x : A \vdash B(x) : U$ is a dependent type over $A$.
 \end{enumerate}
 
-
-\begin{mydefinition}[Homotopy fiber]
-The fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
+Now let's turn to several of the constructions more closely related to the homotopy theoretic side of things. Fibrations can be understood as a homotopy theoretic generalization of the notion of a fiber bundle. If working with spaces, a fibration is a map $\phi : E \to B$, which possesses a certain homotopy-lifting property. In this particular case we would refer to $B$ as the \textit{base space} and to $E$ as the \textit{total space} of the fibration. Given a point $b : B$, the \textit{fiber} over $b$ is just preimage $\phi^{-1}(b)$ of $b$ under the map $\phi$. The idea behind the fibration that it can be completely recovered from its base space $B$ together with its fibers by ``connecting'' the fibers together in accordance with the structure of the base space. Let's proceed with a more formal definitions\autocite{Warren1}.
+The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ and $f$:
 \[
 \begin{diagram}
 	\node{E \times \star}
 		\arrow{s,t}{}
 		\arrow{e,t}{}
 	\node{\star} 
-		\arrow{s,t}{pt} \\
+		\arrow{s,r}{pt} \\
 	\node{E}
-		\arrow{e,t}{f} 
+		\arrow{e,r}{f} 
 	\node{B}
 \end{diagram}
 \]
-\end{mydefinition}
+Lets call fibration any continuous map $p : E \to B$. $E$ will be called the total space and $B$ the base space of the fibration. There are a lot of different fibrations, which come with restriction to this general definition (e.g. trivial fibration, Serre fibration, and so on).
 
-
-Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ are the cylinder and the Moebius strip. Locally they are the same, but globally the Moebius strip comes with a twist as visualized in Figure \ref{fig:1}.
+A fibration $\phi$ is trivial if it is equivalent to a product fibration.
+\[
+\begin{diagram}
+	\node{E}
+		\arrow{s,t}{\phi}
+		\arrow{e,t}{f}
+	\node{B' \times F} 
+		\arrow{s,r}{proj_{B'}} \\
+	\node{B}
+		\arrow{e,r}{\hat{f}} 
+	\node{B'}
+\end{diagram}
+\]
+    
+Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are the cylinder and the Moebius strip, they are visualized in Figure \ref{fig:1}.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[scale=1.25]
@@ -372,11 +384,13 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
   ); 
 \end{axis}
 \end{tikzpicture}
-\caption{Fiber bundles over a circle} \label{fig:1}
+\caption{Fibrations over a circle} \label{fig:1}
 \end{figure}
 
 \section{Example of a fibration}
 
+Now lets start with an example of combining fibrations and dependent types---formalizing Moebius strip using Arend proof-assistant.
+Intuitively, we need to find a way to encode twist that distinguish Moebius strip from cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence.  
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func neg_neg : \Pi (x : I) -> ((inv seg) @ (inv seg @ x)) = x 
@@ -388,15 +402,13 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
           => ((\lam x 
             => (\lam i 
               => inv (connAnd seg i)) (seg @ x)) x) # seg) x))
-\end{lstlisting}
-\end{ListingEnv}
 
-\begin{ListingEnv}[H]
-\begin{lstlisting}
 \func twist : I = I => Iso=>Path
     \new Iso I I neg neg neg_neg neg_neg
 \end{lstlisting}
 \end{ListingEnv}
+
+Now we are able to ``continuously'' get a twisted interval for every term of type $S_1$, which represents a circle.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -406,6 +418,8 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
 }
 \end{lstlisting}
 \end{ListingEnv}
+
+Finally, we can obtain a formalization of the Moebius strip as a total space, which is a pair of a point on a circle and a corresponding fiber.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -417,19 +431,21 @@ Two fiber bundles over a circle  with fiber given by the unit interval $[0,1]$ a
 
 \section{Isomorphism between a fibration and a dependent type}
 
+To prove a correspondence between a fibration and a dependent type we need to formalize these two notions, to provide mutually inverse functions between these constructions and to prove that homotopies between compositions of these two functions and identity functions exist. 
+A formalization of a dependent type is straightforward---it is a function that maps elements of some type to types.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func family (B : \Type) : \Type => B -> \Type
 \end{lstlisting}
 \end{ListingEnv}
-
+Now let's define the total space of a fibration $B \to U$.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func total (B : \Type) (F : family B) : \Type 
 	=> \Sigma (x : B) (F x)
 \end{lstlisting}
 \end{ListingEnv}
-
+Also we need to define a projection that will serve as the trivial fibration.
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func trivial (B : \Type) (F : family B) : total B F -> B 
