@@ -255,6 +255,12 @@
 %В работе рассматривается формализация нетривиального расслоения окружности --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиального расслоения и зависимого типа на верификатор доказательств Arend.
 %Код, которому посвящена данная работа, можно найти на GitHub\autocite{Grp1} в репозитории организации Groupoid Infinity. Доказательство выполнено в файле Bundle.ard\autocite{Bundle}, формализация ленты Мёбиуса --- в файле Moebius.ard\autocite{Moebius}.
 
+\Annot
+
+Гомотопическая теория типов (Homotopy type theory, HoTT) --- область информатики, которая базируется на связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) --- попытки формализовать математику, используя в качестве фундамента не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход интересен тем, что позволяет работать с гомотопической теорией, используя синтетический метод, то есть, не опираясь на более базовые примитивы, как, например, множества.
+В работе рассматривается формализация нетривиального расслоения окружности --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиального расслоения и зависимого типа на верификатор доказательств Arend.
+Код, которому посвящена данная работа, можно найти на GitHub\autocite{Grp1} в репозитории организации Groupoid Infinity. Доказательство выполнено в файле Fiber.ard\autocite{Fiber}, формализация ленты Мёбиуса --- в файле Moebius.ard\autocite{Moebius}.
+
 \Introduction
 
 Proof assistants are computer systems, which are designed to do mathematics on a computer. Some proof assistants also allow to define functions and compute on them, but their main focus is on doing proofs. They allow to define some statements and to reason about their correctness. A few of them, which are also automated theorem provers, also help a user with a set of well chosen decision procedures that allow to automatically prove formulas of a specific restricted format\autocite{ProofAssistants1}.
@@ -265,7 +271,7 @@ There are several proof assistants, which support homotopy type theory natively 
 
 Homotopy type theory relies on the idea that type theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way. % actually homotopy equivalent
 
-In this paper I report on formalizing a Moebius strip and on porting a proof of an equivalence between the fibration and the type family using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy and type theories. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Bundle.ard\autocite{Bundle}).
+In this paper I report on formalizing a Moebius strip and on porting a proof of an equivalence between the fibration and the type family using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy and type theories. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Fiber.ard\autocite{Fiber}).
 
 \section{Preliminaries}
 
@@ -295,6 +301,7 @@ Also we can construct dependent types. Dependent types can be defined using a fe
 
 Now let's turn to several of the constructions more closely related to the homotopy theoretic side of things. Fibrations can be understood as a homotopy theoretic generalization of the notion of a fiber bundle. If working with spaces, a fibration is a map $\phi : E \to B$, which possesses a certain homotopy-lifting property. In this particular case we would refer to $B$ as the \textit{base space} and to $E$ as the \textit{total space} of the fibration. Given a point $b : B$, the \textit{fiber} over $b$ is just preimage $\phi^{-1}(b)$ of $b$ under the map $\phi$. The idea behind the fibration that it can be completely recovered from its base space $B$ together with its fibers by ``connecting'' the fibers together in accordance with the structure of the base space. Let's proceed with a more formal definitions\autocite{Warren1}.
 The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ ($\star$-valued point of $B$) and $f$:
+
 \[
 \begin{diagram}
 	\node{E \times \star}
@@ -307,9 +314,11 @@ The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collec
 	\node{B}
 \end{diagram}
 \]
+
 Lets call fibration any continuous map $p : E \to B$, which has the homotopy-lifting property from arbitrary spaces. $E$ will be called the total space and $B$ the base space of the fibration. There are a lot of different fibrations, which come with restriction to this general definition (e.g. trivial fibration, Serre fibration, and so on)\autocite{Warren1}.
 
 A fibration $\phi$ is trivial if it is equivalent to a product fibration\autocite{Warren1}.
+
 \[
 \begin{diagram}
 	\node{E}
@@ -324,6 +333,7 @@ A fibration $\phi$ is trivial if it is equivalent to a product fibration\autocit
 \]
     
 Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are the cylinder and the Moebius strip, they are visualized in Figure \ref{fig:1}.
+
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[scale=1.25]
@@ -387,10 +397,13 @@ Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are t
 \caption{Fibrations over a circle} \label{fig:1}
 \end{figure}
 
-\section{Example of a fibration}
+\section{Moebius strip as an example of a fibration}
+
+% анонс кода, код, пояснение кода (хотя бы чуть-чуть!), общее рассуждение, новый анонс и т.д. 
 
 Now lets start with an example of combining fibrations and dependent types---formalizing Moebius strip using Arend proof-assistant.
-Intuitively, we need to find a way to encode twist that distinguish Moebius strip from cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence.  
+Intuitively, we need to find a way to encode twist that distinguish Moebius strip from cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence. 
+ 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func neg_neg : \Pi (x : I) -> ((inv seg) @ (inv seg @ x)) = x 
@@ -433,33 +446,42 @@ Finally, we can obtain a formalization of the Moebius strip as a total space, wh
 
 To prove a correspondence between the fibration and the dependent type we need to formalize these two notions, to provide mutually inverse functions between these constructions and to prove that homotopies between compositions of these two functions and identity functions exist. 
 A formalization of a dependent type is straightforward---it is a function that maps elements of some type to types.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func family (B : \Type) : \Type => B -> \Type
 \end{lstlisting}
 \end{ListingEnv}
+
 Now let's define the total space of a fibration $B \to U$.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func total (B : \Type) (F : family B) : \Type 
 	=> \Sigma (x : B) (F x)
 \end{lstlisting}
 \end{ListingEnv}
+
 Also we need to define a projection that will serve as the trivial fibration.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func trivial (B : \Type) (F : family B) : total B F -> B 
 	=> \lam (x : total B F) => x.1
 \end{lstlisting}
 \end{ListingEnv}
+
 The homotopy fiber of $f : A \to B$ over $base : B$ can be defined as an element of $A$ together with a path from $f x$ to $base$.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func fiber (A B : \Type) (f : A -> B) (base : B)
    => \Sigma (x : A) (f x = base)
 \end{lstlisting}
 \end{ListingEnv}
-To construct an element of a given dependent type parameterized by some element $y : B$ from the fiber of trivial projection over the same element we can use a wrapper around an eliminator for the interval type.   
+
+To construct an element of a given dependent type parameterized by some element $y : B$ from the fiber of trivial projection over the same element we can use a wrapper around an eliminator for the interval type. 
+  
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func encode (B : \Type) (F : B -> \Type) (y : B) :
@@ -468,7 +490,9 @@ To construct an element of a given dependent type parameterized by some element 
    => subst B F x.1.1 y x.2 x.1.2
 \end{lstlisting}
 \end{ListingEnv}
+
 An inverse of the previous function can be defined be direct fiber construction. 
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func decode (B : \Type) (F : B -> \Type) (y : B) :
@@ -476,7 +500,9 @@ An inverse of the previous function can be defined be direct fiber construction.
    => \lam (x : F y) => ((y, x), path (\lam i => y))
 \end{lstlisting}
 \end{ListingEnv}
+
 To prove that a composition of decode and encode in this particular order is just an identity map we can prove that application of some element $x$ to the composition equals the exactly same element. The proof is straightforward since the outer function has an extra computational rule because it is defined with coe.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func decode->encode (B : \Type) (F : family B) (y : B) :
@@ -490,7 +516,33 @@ To prove that a composition of decode and encode in this particular order is jus
               (decode B F y x))
 \end{lstlisting}
 \end{ListingEnv}
-TODO
+
+\begin{tikzpicture}
+\draw plot [smooth cycle] coordinates {(-0.83,-2.31)(-1.73,0.25)(-1.15,2.29)(1.07,1.60)(1.74,-1.93)(0.31,-2.62)} 
+node at (0.25,-3) {$F\ y$};
+
+\draw plot [smooth cycle] coordinates {(5.83,-2.31)(3.73,0.25)(3.15,2.29)(6.07,1.60)(6.74,-1.93)} 
+node at (5.65,-3) {$F\ x.1.1$};
+
+\coordinate (p1) at (-0.5,-1);
+\node[above left=5pt of {p1}, outer sep=2pt] {$encode\ B\ F\ y\ x$};
+\filldraw (p1) circle[radius=1.5pt];
+
+\coordinate (p2) at (5.75,-1.52);
+\node[above right=5pt of {p2}, outer sep=2pt] {$coe\ A\ a\ right$};
+\filldraw (p2) circle[radius=1.5pt];
+
+\coordinate (p3) at (4.22,1.44);
+\node[above=5pt of {p3}, outer sep=2pt] {$x.1.2$};
+\filldraw (p3) circle[radius=1.5pt];
+
+\draw[-latex] (p1) to [bend left] node [sloped,midway,below=0.5cm]{$path\ (\\lam\ i\ =>\ coe\ A\ a\ i)$} (p2);
+
+\draw[-latex] [densely dotted](p2) to [bend right] node [sloped,midway,above]{?} (p3);
+
+\draw[-latex][densely dotted] (p1) to[bend left] node [sloped,midway,above right=0cm and 0.3cm]{$p$} (p3);
+\end{tikzpicture}
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func encode->decode (B : \Type) (F : family B) (y : B) :
@@ -514,7 +566,9 @@ TODO
                 => transport B (inv p') (transport B p' x) = x) rfl p
 \end{lstlisting}
 \end{ListingEnv}
+
 To obtain an element of the identity type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ from equivalence we can use an univalence. To do so we can use a wrapper around Arend built-in function iso that implies the univalence axiom.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func hFiber=DependentTypeParameterized (B : \Type) 
@@ -530,7 +584,9 @@ To obtain an element of the identity type $(fiber\ (total\ B\ F)\ B\ (trivial\ B
   		(decode->encode B F y))
 \end{lstlisting}
 \end{ListingEnv}
+
 We can go even further. Since we have proved that for every element of base type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ holds, we can prove that family itself equals a fiber over an arbitrary point.
+
 \begin{ListingEnv}[H]
 \begin{lstlisting}
 \func Fibration=DependentType (B : \Type) (F : family B) : 
@@ -539,9 +595,11 @@ We can go even further. Since we have proved that for every element of base type
     => (hFiber=DependentTypeParameterized B F y) @ i)
 \end{lstlisting}
 \end{ListingEnv}
-Quod erat demonstrandum.
+
 \Conc
+
 In this paper I provided the proof of a correspondence between dependent types---basic type theoretic constructions, and fibrations---basic homotopy theoretic constructions in the proof-assistant Arend. This correspondence shows that working on homotopy theory can be approached syntactically if using type theory with ease, because there is no need for complex definitions of simplest homotopy construction.
+
 \begin{otherlanguage}{english}
 \printbibliography[%{}
     heading=bibintoc%

@@ -3,7 +3,12 @@
 % макросы для начала введения и заключения
 \newcommand{\Introduction}{\addsec{Introduction}}
 \ifthenelse{\value{worktype} > 1}{%
-    \renewcommand{\Intro}{\addchap{Annotation}}%
+    \renewcommand{\Intro}{\addchap{Introduction}}%
+}
+
+\newcommand{\Annot}{\addsec{Аннотация}}
+\ifthenelse{\value{worktype} > 1}{%
+    \renewcommand{\Intro}{\addchap{Аннотация}}%
 }
 
 \newcommand{\Conc}{\addsec{Сonclusion}}
