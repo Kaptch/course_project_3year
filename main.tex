@@ -159,8 +159,6 @@ Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are t
 
 \section{Moebius strip as an example of a fibration}
 
-% анонс кода, код, пояснение кода (хотя бы чуть-чуть!), общее рассуждение, новый анонс и т.д. 
-
 Now, let's start with an example of combining fibrations and dependent types---formalizing Moebius strip using Arend proof-assistant.
 Intuitively, we need to find a way to encode a twist that distinguishes Moebius strip from a cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence. 
  
@@ -181,6 +179,8 @@ Intuitively, we need to find a way to encode a twist that distinguishes Moebius 
 \end{lstlisting}
 \end{ListingEnv}
 
+Actually, \texttt{inv seg @ i} can be seen as $1-i$, so the function defined above shows that for an arbitrary interval point $i$ and an arbitrary path $p$ $(-p)\ @\ (1-i)\ =\ i$.
+
 Now we are able to ``continuously'' get a twisted interval for every term of type $S_1$, which represents a circle.
 
 \begin{ListingEnv}[H]
@@ -192,7 +192,9 @@ Now we are able to ``continuously'' get a twisted interval for every term of typ
 \end{lstlisting}
 \end{ListingEnv}
 
-Finally, we can obtain a formalization of the Moebius strip as a total space, which is a pair of a point on a circle and a corresponding fiber.
+The element $base : S_1$ is mapped to the interval type and other elements of $S_1$ are mapped to the elements, obtained using the path \texttt{twist}.
+
+Finally, we can obtain a formalization of the Moebius strip as the total space of a nontrivial fibration over the circle. 
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -201,6 +203,8 @@ Finally, we can obtain a formalization of the Moebius strip as a total space, wh
 }
 \end{lstlisting}
 \end{ListingEnv}
+
+The projection map, which returns the first element of this dependent pair, is a fibration, $S_1$ is a base, and fibers are given by function \texttt{M}.
 
 \section{Isomorphism between a fibration and a dependent type}
 
@@ -222,7 +226,7 @@ Now let's define the total space of a fibration $B \to U$.
 \end{lstlisting}
 \end{ListingEnv}
 
-Also we need to define a projection that will serve as the trivial fibration.
+Also we need to define a projection that will serve as a trivial fibration.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -240,7 +244,7 @@ The homotopy fiber of $f : A \to B$ over $base : B$ can be defined as an element
 \end{lstlisting}
 \end{ListingEnv}
 
-To construct an element of a given dependent type parameterized by some element $y : B$ from the fiber of trivial projection over the same element we can use a wrapper around an eliminator for the interval type. 
+Now we need to define mutually inverse functions between the type that represents a type family and the type that represents a trivial fibration. 
   
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -251,7 +255,9 @@ To construct an element of a given dependent type parameterized by some element 
 \end{lstlisting}
 \end{ListingEnv}
 
-An inverse of the previous function can be defined be direct fiber construction. 
+To construct an element of a given dependent type parameterized by some element $y : B$ from the fiber of trivial projection over the same element we can use a wrapper around an eliminator for the interval type. The function \texttt{subst} transports $u : P\ x$ to $P\ y$ along $p : x = y$.
+
+An inverse of the previous function can be defined by straightforward construction.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -261,7 +267,9 @@ An inverse of the previous function can be defined be direct fiber construction.
 \end{lstlisting}
 \end{ListingEnv}
 
-To prove that a composition of decode and encode in this particular order is just an identity map we can prove that application of some element $x$ to the composition equals the exactly same element. The proof is straightforward since the outer function has an extra computational rule because it is defined with coe.
+Since \texttt{trivial} is just a projection, we can define a path for a fibration as a constant path.
+
+To prove that a composition of decode and encode in this particular order is just an identity map we can prove that application of some element $x$ to the composition equals the exactly same element.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -272,11 +280,17 @@ To prove that a composition of decode and encode in this particular order is jus
       => encode
               B
               F
-              ((decode B F y x).2 @ i)
+              y
               (decode B F y x))
 \end{lstlisting}
 \end{ListingEnv}
 
+Since the outer function has an extra computational rule because it is defined with coe, the needed function can be defined as a constant path.
+
+The second homotopy is harder to define. We need to define three paths---one for each element of a given fibration. The first path is trivial but the other two come with some difficulties, since these paths connect elements of different types. The problem with the second path is illustrated in Figure \ref{fig:2}.
+
+\begin{figure}[H]
+\centering
 \begin{tikzpicture}
 \draw plot [smooth cycle] coordinates {(-0.83,-2.31)(-1.73,0.25)(-1.15,2.29)(1.07,1.60)(1.74,-1.93)(0.31,-2.62)} 
 node at (0.25,-3) {$F\ y$};
@@ -296,12 +310,19 @@ node at (5.65,-3) {$F\ x.1.1$};
 \node[above=5pt of {p3}, outer sep=2pt] {$x.1.2$};
 \filldraw (p3) circle[radius=1.5pt];
 
-\draw[-latex] (p1) to [bend left] node [sloped,midway,below=0.5cm]{$path\ (\\lam\ i\ =>\ coe\ A\ a\ i)$} (p2);
+\draw[-latex] (p1) to [bend left] node [sloped,midway,below=0.5cm]{$path (\lambda i\ =>\ coe\ A\ a\ i)$} (p2);
 
 \draw[-latex] [densely dotted](p2) to [bend right] node [sloped,midway,above]{?} (p3);
 
 \draw[-latex][densely dotted] (p1) to[bend left] node [sloped,midway,above right=0cm and 0.3cm]{$p$} (p3);
 \end{tikzpicture}
+\caption{}
+\label{fig:2}
+\end{figure}
+
+Our goal is to define $p$. Since we can construct a path from $encode\ B\ F\ y\ x$ to $coe\ A\ a\ right$, we need to find a path from $coe\ A\ a\ right$ to $x.1.2$. This path is provided by \texttt{transport\_twist}.
+
+The third path is obtained almost in the same way with some adjustments for paths.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -327,7 +348,7 @@ node at (5.65,-3) {$F\ x.1.1$};
 \end{lstlisting}
 \end{ListingEnv}
 
-To obtain an element of the identity type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ from equivalence we can use an univalence. To do so we can use a wrapper around Arend built-in function iso that implies the univalence axiom.
+To obtain an element of the identity type \texttt{(fiber (total B F) B (trivial B F) y) = (F y)} from equivalence we can use an univalence. To do so we can use a wrapper around Arend built-in function iso that implies the univalence axiom.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -345,7 +366,7 @@ To obtain an element of the identity type $(fiber\ (total\ B\ F)\ B\ (trivial\ B
 \end{lstlisting}
 \end{ListingEnv}
 
-We can go even further. Since we have proved that for every element of base type $(fiber\ (total\ B\ F)\ B\ (trivial\ B\ F)\ y)\ =\ (F\ y)$ holds, we can prove that family itself equals a fiber over an arbitrary point.
+We can go even further. Since we have proved that for every element of base type \texttt{(fiber (total B F) B (trivial B F) y) = (F y)} holds, we can prove that family itself equals a fiber over an arbitrary point.
 
 \begin{ListingEnv}[H]
 \begin{lstlisting}
