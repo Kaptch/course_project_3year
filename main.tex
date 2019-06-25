@@ -1,12 +1,4 @@
-% В этом файле следует писать текст работы, разбивая его на
-% разделы (section), подразделы (subsection) и, если нужно,
-% главы (chapter).
-
-% Предварительно следует указать необходимую информацию
-% в файле SETUP.tex
-
 \input{preamble.tex}
-
 
 \NewBibliographyString{langjapanese}
 \NewBibliographyString{fromjapanese}
@@ -19,7 +11,7 @@
 Гомотопическая теория типов (Homotopy type theory, HoTT) выделяется тем, что базируется на связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) --- попытки формализовать математику, используя в качестве фундамента не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход интересен тем, что позволяет работать с гомотопической теорией, используя синтетический метод, то есть, не опираясь на более базовые примитивы, как, например, множества.
 
 В данный момент существует несколько систем верификации, которые поддерживают гомотопическую теорию типов нативно или благодаря расширениям, но эта поддержка обеспечивается различными наборами примитивных операций, для некоторых из которых существует совсем мало примеров.
-В работе рассматривается формализация нетривиального расслоения над окружностью --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиального расслоения и зависимого типа на верификатор доказательств Arend. Это доказательство показывает, что базовые теоретико-типовые конструкции соответствуют гомотопическим.
+В работе рассматривается формализация нетривиального расслоения над окружностью --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиальных расслоений и зависимых типов на верификатор доказательств Arend. Это доказательство показывает, что базовые теоретико-типовые конструкции соответствуют гомотопическим.
 
 Код, которому посвящена данная работа, можно найти на GitHub\autocite{Grp1} в репозитории организации Groupoid Infinity. Доказательство выполнено в файле Fiber.ard\autocite{Fiber}, формализация ленты Мёбиуса --- в файле Moebius.ard\autocite{Moebius}.
 
@@ -31,9 +23,9 @@ A large part of proof assistants is based on type theory, which is due to Curry�
 
 There are several proof assistants, which support homotopy type theory natively or via extensions. Some of them are Coq\autocite{Coq}, Agda\autocite{Agda}, cubicaltt\autocite{Cubicaltt}, and redtt\autocite{Redtt}. They come with different sets of most basic operations. Some of these sets are studied better than others. Arend\autocite{Arend} is a proof assistant, which provides users with an interval type (a type that is inductively constructed from two terms, whose interpretation is as the endpoints of the interval, together with a path between them); an eliminator for an interval type---\textit{coe}, which allows, for every type over the interval, to transport elements from the fiber over left to the fiber over an arbitrary point; a dependent path type, which consists of all functions that maps elements of the interval type to the term of type parameterized by the given term of the interval type; and a function \textit{iso}, which can be used to define univalence---one of the cornerstones of homotopy type theory\autocite{Arenddocs}\autocite{nlab}.
 
-Homotopy type theory relies on the idea that type-theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy-theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way. % actually homotopy equivalent
+Homotopy type theory relies on the idea that type-theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy-theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way.
 
-In this paper I report on formalizing a Moebius strip and on porting a proof of equivalence between the fibration and the type family using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy and type theories. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Fiber.ard\autocite{Fiber}).
+In this paper I report on formalizing a Moebius strip and on porting a proof of equivalence of the fibration and the family of types using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy theory and type theory. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Fiber.ard\autocite{Fiber}).
 
 \section{Preliminaries}
 
@@ -246,7 +238,7 @@ The homotopy fiber of $f : A \to B$ over $base : B$ can be defined as an element
 \end{lstlisting}
 \end{ListingEnv}
 
-Now we need to define mutually inverse functions between the type that represents a type family and the type that represents a trivial fibration. 
+Now we need to define mutually inverse functions between the type that represents a family of types and the type that represents a trivial fibration. 
   
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -384,8 +376,8 @@ We can go even further. Since we have proved that for every element of base type
 In this paper I provided the proof of a correspondence between dependent types---basic type theoretic constructions, and fibrations---basic homotopy theoretic constructions in the proof-assistant Arend. This correspondence shows that working on homotopy theory can be approached syntactically if using type theory with ease, because there is no need for complex definitions of the simplest homotopy construction.
 
 \begin{otherlanguage}{english}
-\printbibliography[%{}
-    heading=bibintoc%
+\printbibliography[
+    heading=bibintoc
     ,title=Bibliography
 ]
 \end{otherlanguage}
