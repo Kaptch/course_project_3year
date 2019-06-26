@@ -8,7 +8,7 @@
 \Annot
 
 Системы верификации --- программы, разработанные для формализации доказательств на компьютере. Б\'{о}льшая часть из них базируется на теории типов, которая делится на множество подвидов.
-Гомотопическая теория типов (Homotopy type theory, HoTT) выделяется тем, что базируется на связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) --- попытки формализовать математику, используя в качестве фундамента не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход интересен тем, что позволяет работать с гомотопической теорией, используя синтетический метод, то есть, не опираясь на более базовые примитивы, как, например, множества.
+Гомотопическая теория типов (Homotopy type theory, HoTT) выделяется тем, что основывается на связи между теорией типов и теорией гомотопий. Эта область лежит в основе Унивалентных оснований математики (Univalent Foundation, UF) --- попытки формализовать математику, используя в качестве фундамента не множества, а гомотопические типы или $\infty$-группоиды, а также высшие индуктивные типы (Higher Inductive Types, HIT). Этот подход интересен тем, что позволяет работать с гомотопической теорией, используя синтетический метод, то есть, не опираясь на более базовые примитивы, как, например, множества.
 
 В данный момент существует несколько систем верификации, которые поддерживают гомотопическую теорию типов нативно или благодаря расширениям, но эта поддержка обеспечивается различными наборами примитивных операций, для некоторых из которых существует совсем мало примеров.
 В работе рассматривается формализация нетривиального расслоения над окружностью --- ленты Мёбиуса, а также портирование доказательства изоморфизма тривиальных расслоений и зависимых типов на верификатор доказательств Arend. Это доказательство показывает, что базовые теоретико-типовые конструкции соответствуют гомотопическим.
@@ -23,9 +23,9 @@ A large part of proof assistants is based on type theory, which is due to Curry�
 
 There are several proof assistants, which support homotopy type theory natively or via extensions. Some of them are Coq\autocite{Coq}, Agda\autocite{Agda}, cubicaltt\autocite{Cubicaltt}, and redtt\autocite{Redtt}. They come with different sets of most basic operations. Some of these sets are studied better than others. Arend\autocite{Arend} is a proof assistant, which provides users with an interval type (a type that is inductively constructed from two terms, whose interpretation is as the endpoints of the interval, together with a path between them); an eliminator for an interval type---\textit{coe}, which allows, for every type over the interval, to transport elements from the fiber over left to the fiber over an arbitrary point; a dependent path type, which consists of all functions that maps elements of the interval type to the term of type parameterized by the given term of the interval type; and a function \textit{iso}, which can be used to define univalence---one of the cornerstones of homotopy type theory\autocite{Arenddocs}\autocite{nlab}.
 
-Homotopy type theory relies on the idea that type-theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{type families}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy-theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way.
+Homotopy type theory relies on the idea that type-theoretic constructions correspond to some equivalents from homotopy theory. E.g., the statement that the term $a$ is of type $A$, which is written as $a:A$, can be expressed as ``$A$ is a space and $a$ is a point of A''. In addition to the kinds of types and terms above, we also may consider types and terms with parameters. These are usually called \textit{dependent} types (or \textit{family of types}) and terms (if $B$ is a type, then we might have a type $(x:B)\ E(x)$, which is parameterized by $B$). From the homotopy-theoretic point of view, we might think of such a type as a \textit{fibration} $E \to B$ over the space $B$. The fibration makes precise the idea of one space (\textit{fiber}) being parameterized by another (\textit{base}) with fibers being equivalent in some coherent way.
 
-In this paper I report on formalizing a Moebius strip and on porting a proof of equivalence of the fibration and the family of types using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of a correspondence between basic constructions of homotopy theory and type theory. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Fiber.ard\autocite{Fiber}).
+In this paper I report on formalizing a Moebius strip and on porting a proof of equivalence of the fibration and the family of types using the proof assistant Arend. The former task is a demonstration of basic Arend features and the latter is an evidence of correspondence between basic constructions of homotopy theory and type theory. The code can be found in Arend Groupoid Infinity repository (moebius strip: Moebius.ard\autocite{Moebius}, proof: Fiber.ard\autocite{Fiber}).
 
 \section{Preliminaries}
 
@@ -53,7 +53,7 @@ Also we can construct dependent types. Dependent types can be defined using a fe
   \item A dependent type is a morphism to the universe $P : A \to U$, so a dependent type $P : A \to U$ provides us with a type $P(a)$ for any $a : A$. A judgment $x : A \vdash B(x) : U$ is a dependent type over $A$.
 \end{enumerate}
 
-Now let's turn to several of the constructions more closely related to the homotopy-theoretic side of things. Fibrations can be understood as a homotopy-theoretic generalization of the notion of a fiber bundle. If working with spaces, a fibration is a map $\phi : E \to B$, which possesses a certain homotopy-lifting property. In this particular case, we would refer to $B$ as the \textit{base space} and to $E$ as the \textit{total space} of the fibration. Given a point $b : B$, the \textit{fiber} over $b$ is just preimage $\phi^{-1}(b)$ of $b$ under the map $\phi$. The idea behind the fibration that it can be completely recovered from its base space $B$ together with its fibers by ``connecting'' the fibers together in accordance with the structure of the base space. Let's proceed with a more formal definitions\autocite{Warren1}.
+Now let's turn to several of the constructions more closely related to the homotopy-theoretic side of things. Fibrations can be understood as a homotopy-theoretic generalization of the notion of a fiber bundle. If working with spaces, a fibration is a map $\phi : E \to B$, which possesses a certain homotopy-lifting property. In this particular case, we would refer to $B$ as the \textit{base space} and to $E$ as the \textit{total space} of the fibration. Given a point $b : B$, the \textit{fiber} over $b$ is just preimage $\phi^{-1}(b)$ of $b$ under the map $\phi$. The idea behind the fibration that it can be completely recovered from its base space $B$ together with its fibers by ``connecting'' the fibers together in accordance with the structure of the base space. Let's proceed with a more formal definition\autocite{Warren1}.
 The homotopy fiber of a morphism $f : E \to B$ over a point of $B$ is the collection of elements of $E$ that are mapped by $f$ to this point, hence it is the following pullback (or fiber product) of $pt$ ($\star$-valued point of $B$) and $f$:
 
 \[
@@ -93,12 +93,12 @@ Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are t
 \begin{tikzpicture}[scale=1.25]
 \begin{axis}[
     hide axis,
-    view={40}{40}
+    view={40}{30}
 ]
 \addplot3 [
     surf, shader = faceted interp,
     point meta = x,
-    colormap/greenyellow,
+    colormap/blackwhite,
     samples = 40,
     samples y = 5,
     z buffer = sort,
@@ -124,16 +124,16 @@ Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are t
 \addplot3 [
     surf, shader = faceted interp,
     point meta = x,
-    colormap/greenyellow,
+    colormap/blackwhite,
     samples = 40,
     samples y = 5,
     z buffer = sort,
     domain = 0:360,
     y domain = -1:1
 ] (
-    {(1+0.5*y*cos(x/2)))*cos(x)},
-    {(1+0.5*y*cos(x/2)))*sin(x)},
-    {0.5*y*sin(x/2)}
+    {(1+0.5*y*cos(0.5*x)))*cos(x)},
+    {(1+0.5*y*cos(0.5*x)))*sin(x)},
+    {0.5*y*sin(0.5*x)}
   );
   
 \addplot3 [
@@ -154,7 +154,7 @@ Two fibrations over a circle with fiber given by the unit interval $[0,1]$ are t
 \section{Moebius strip as an example of a fibration}
 
 Now, let's start with an example of combining fibrations and dependent types---formalizing Moebius strip using Arend proof-assistant.
-Intuitively, we need to find a way to encode a twist that distinguishes Moebius strip from a cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence. 
+Intuitively, we need to find a way to encode a twist that distinguishes the Moebius strip from the cylinder. Since the fiber is the interval, our goal is to ``rotate'' it. In order to do so we can get a path induced by a map that rotates interval using univalence. 
  
 \begin{ListingEnv}[H]
 \begin{lstlisting}
@@ -173,7 +173,7 @@ Intuitively, we need to find a way to encode a twist that distinguishes Moebius 
 \end{lstlisting}
 \end{ListingEnv}
 
-Actually, \texttt{inv seg @ i} can be seen as $1-i$, so the function defined above shows that for an arbitrary interval point $i$ and an arbitrary path $p$ $(-p)\ @\ (1-i)\ =\ i$.
+Actually, \texttt{inv seg @ i} can be seen as $1-i$, so the function defined above shows that for an arbitrary interval point $i$ and for an arbitrary path $p$ $(-p)\ @\ (1-i)\ =\ i$.
 
 Now we are able to ``continuously'' get a twisted interval for every term of type $S_1$, which represents a circle.
 
@@ -373,7 +373,7 @@ We can go even further. Since we have proved that for every element of base type
 
 \Conc
 
-In this paper I provided the proof of a correspondence between dependent types---basic type theoretic constructions, and fibrations---basic homotopy theoretic constructions in the proof-assistant Arend. This correspondence shows that working on homotopy theory can be approached syntactically if using type theory with ease, because there is no need for complex definitions of the simplest homotopy construction.
+In this paper I provided the proof of correspondence between dependent types---basic type theoretic constructions, and fibrations---basic homotopy theoretic constructions in the proof-assistant Arend. This correspondence shows that working on homotopy theory can be approached syntactically if using type theory with ease, because there is no need for complex definitions of the simplest homotopy construction.
 
 \begin{otherlanguage}{english}
 \printbibliography[
